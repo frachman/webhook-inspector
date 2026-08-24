@@ -10,8 +10,8 @@ inspect them through a private viewer.
 
 ## Current State
 
-Milestones 0, 1, and 2 are complete, along with the retention-controls portion
-of Milestone 3. The application now has a minimal web viewer over the backend
+Milestones 0, 1, and 2 are complete, along with Milestone 3's local safeguards
+and validation. The application now has a minimal web viewer over the backend
 vertical slice:
 
 ```text
@@ -137,10 +137,9 @@ Local web/API smoke verification on 2026-08-24:
   server were run together on local-only ports.
 - The web proxy sequence passed: endpoint creation, POST capture, and
   authenticated request listing.
-- The initial viewer render was visually checked in a browser. That browser
-  connection did not deliver click events, even after retrying in a fresh tab,
-  so copy support, local-storage restoration, refresh, and request-detail
-  interaction remain unverified in a browser.
+- Manual browser validation confirmed endpoint creation, copying the generated
+  webhook URL, request capture, refresh, safe request-detail display, and
+  endpoint persistence after a page reload.
 
 ## Decisions to Preserve
 
@@ -167,16 +166,16 @@ must be addressed before public exposure as appropriate.
 
 ## Recommended Next Milestone
 
-Milestone 3: complete the remaining operational safeguards before public
-exposure.
+Next milestone: deployment planning for public exposure.
 
 Smallest useful scope:
 
-1. Run the pending interactive browser checks against the documented local
-   stack: endpoint creation, copy support, local-storage restoration, request
-   list refresh, and safe request-detail display.
-2. Add deployment and exposure controls only after an explicit hosting target
-   is selected and audited.
+1. Select and perform a read-only suitability audit of the hosting target for
+   `hookbin.farandy.id`; do not infer a host from prior projects.
+2. Design deployment, PostgreSQL backup/restore, TLS, forwarding-header, and
+   exposure controls for that target before making any infrastructure change.
+3. Make the first deployment only after the plan, backup readiness, and exact
+   target identity are accepted.
 
 Do not add accounts, SSE, distributed infrastructure, or broad portfolio polish
 as part of this milestone.
