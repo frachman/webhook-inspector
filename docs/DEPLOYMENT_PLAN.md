@@ -62,8 +62,10 @@ On 2026-08-24, the operator confirmed:
 4. Define backup and restore evidence before first exposure: PostgreSQL logical
    dump destination, encryption/access, restore command, and recovery owner.
 5. Build immutable application images and a dedicated Compose stack. The
-   repository does not yet contain Dockerfiles or production Compose artifacts,
-   so this is a separate implementation change.
+   repository provides Dockerfiles, a production Compose template, and a
+   GitHub Actions workflow that publishes SHA-tagged images to GHCR after the
+   normal CI checks pass. Configure the resulting immutable image references
+   only in the server-only `/srv/hookbin/.env` file.
 
 ## Bounded Deployment Change
 

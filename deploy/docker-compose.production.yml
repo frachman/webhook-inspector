@@ -1,0 +1,68 @@
+name: hookbin
+
+services:
+  postgres:
+    image: postgres:17.6-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-hookbin}
+      POSTGRES_USER: ${POSTGRES_USER:-hookbin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in the server-only env file}
+    volumes:
+      - hookbin-postgres-data:/var/lib/postgresql/data
+    networks:
+      - hookbin-internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  api:
+    image: ${HOOKBIN_API_IMAGE:?set an immutable Hookbin API image reference}
+    restart: unless-stopped
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-hookbin}
+      DB_USERNAME: ${POSTGRES_USER:-hookbin}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in the server-only env file}
+      SERVER_FORWARD_HEADERS_STRATEGY: framework
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - hookbin-internal
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/actuator/health | grep -q '\"status\":\"UP\"'"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  web:
+    image: ${HOOKBIN_WEB_IMAGE:?set an immutable Hookbin web image reference}
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      hookbin-internal:
+      web:
+        aliases:
+          - webhook-inspector-web
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/ | grep -q 'Webhook Inspector'"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+networks:
+  hookbin-internal:
+    internal: true
+  web:
+    external: true
+    name: ${CADDY_NETWORK:-web}
+
+volumes:
+  hookbin-postgres-data:

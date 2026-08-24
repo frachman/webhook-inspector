@@ -58,6 +58,14 @@ historical milestone anchors, not a substitute for live state.
   at capacity evicts that endpoint's oldest request.
 - Scheduled physical deletion of expired endpoints (and their requests through
   the database foreign-key cascade), defaulting to an hourly interval.
+- Production Dockerfiles for the API and web viewer, both running as
+  non-root users.
+- A production Compose template that keeps PostgreSQL and the API on a private
+  network and attaches only the web container to Caddy's existing external
+  network.
+- CI image-build checks and a separate GHCR publisher that emits API and web
+  images tagged with the immutable Git commit SHA only after CI succeeds for a
+  `main` commit.
 
 ## API Surface
 
@@ -181,6 +189,11 @@ Current deployment-planning evidence is in `docs/DEPLOYMENT_PLAN.md`. The
 candidate Mikrolyt VPS has a compatible Caddy/Docker topology, but privileged
 preflight access requires operator-assisted sudo and `hookbin.farandy.id` has
 no public DNS record.
+
+The repository now has the local delivery artifacts in `deploy/`, but they
+have not been pushed, published to GHCR, or deployed. Backup destination,
+GHCR package visibility or VPS pull authorization, DNS, and the approved
+server change record remain required before first exposure.
 
 Do not add accounts, SSE, distributed infrastructure, or broad portfolio polish
 as part of this milestone.

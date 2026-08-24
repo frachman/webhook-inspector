@@ -49,8 +49,27 @@ Confirm these choices explicitly:
 3. Deployment ownership: use `/srv/hookbin`, a dedicated Compose project,
    `hookbin-internal` network, and a named PostgreSQL volume. Do not reuse
    another application's database or volume.
-4. Image source: decide whether the server builds from a checked-out revision
-   or pulls immutable registry images. Prefer immutable images for release.
+4. Image source: use immutable GHCR images published from `main`. The server
+   must pull the exact SHA-tagged API and web image references; it must not
+   build application source during release.
+
+## Repository Delivery Artifacts
+
+The repository supplies the following files for review before Phase 3:
+
+- `apps/api/Dockerfile` and `apps/web/Dockerfile` build the application images.
+- `.github/workflows/ci.yml` verifies both image builds without publishing.
+- `.github/workflows/publish-images.yml` publishes separate API and web images
+  tagged as `sha-<Git commit>` only after CI succeeds for a `main` commit.
+- `deploy/docker-compose.production.yml` keeps PostgreSQL and API private and
+  attaches only the web container to the existing external `web` network.
+- `deploy/hookbin.env.example` is a non-secret reference. Copy it to
+  `/srv/hookbin/.env` and replace values there only.
+
+Before allowing a first image push, confirm that the GitHub repository permits
+GitHub Actions to write packages and decide whether the resulting GHCR packages
+will be public (recommended for the VPS pull path) or whether the server will
+hold a narrowly scoped read-only package credential outside Git.
 
 ## Phase 3 — Change Proposal Gate
 
