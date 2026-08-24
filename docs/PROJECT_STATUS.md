@@ -49,6 +49,9 @@ historical milestone anchors, not a substitute for live state.
   HTML is never inserted into the page as executable or rendered markup.
 - A same-origin Next.js proxy routes viewer API calls to the Spring API without
   adding a broad CORS policy to the backend.
+- GitHub Actions CI workflow for pushes and pull requests to `main`: Maven API
+  integration tests on JDK 17, plus a reproducible Next.js production build on
+  Node.js 24.
 
 ## API Surface
 
@@ -108,6 +111,16 @@ Result: the production build completed successfully, and the local-only smoke
 request returned HTTP 200 with the expected page title and introductory
 content. The interactive create, copy, proxy, list, and detail flows have not
 been exercised against a running API in a browser.
+
+CI workflow verification on 2026-08-24:
+
+- `.github/workflows/ci.yml` was syntax-checked locally.
+- `mvn --batch-mode --file apps/api/pom.xml test` passed locally: 3
+  PostgreSQL Testcontainer integration tests passed.
+- `npm ci --prefix apps/web` and `npm run build --prefix apps/web` passed
+  locally.
+- The workflow has not run on GitHub yet; it requires a separately approved
+  push before remote execution can be claimed.
 
 ## Decisions to Preserve
 
