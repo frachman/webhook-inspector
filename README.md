@@ -41,3 +41,16 @@ curl -sS http://localhost:8080/api/endpoints/ENDPOINT_ID/requests \
 ```
 
 The viewer token is never stored directly; only its SHA-256 digest is persisted.
+
+## Continue in a New CLI Session
+
+Coding agents should read `AGENTS.md` automatically. For a quick manual handoff:
+
+```bash
+./scripts/project.sh context
+```
+
+Check the local toolchain with `./scripts/project.sh doctor` and run the complete
+backend verification with `./scripts/project.sh verify`. The durable milestone
+record, decisions, limitations, and recommended next work live in
+`docs/PROJECT_STATUS.md`.
