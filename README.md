@@ -22,6 +22,22 @@ mvn -f apps/api/pom.xml spring-boot:run
 
 Flyway applies the schema at startup. No credentials belong in this repository.
 
+## Run the web viewer
+
+In a second terminal, after the API is running:
+
+```bash
+cd apps/web
+npm install
+npm run dev
+```
+
+Open `http://localhost:3000`. The web server proxies API calls to
+`http://localhost:8080` by default. Set `API_ORIGIN` if the API runs elsewhere;
+see `apps/web/.env.example`. The browser retains the current endpoint ID and
+viewer token in local storage, so use **Forget this endpoint** on a shared
+machine.
+
 ## Vertical-slice API
 
 Create a disposable endpoint:

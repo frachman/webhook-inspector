@@ -10,7 +10,8 @@ inspect them through a private viewer.
 
 ## Current State
 
-Milestone 0 and Milestone 1 are complete. The backend vertical slice works:
+Milestones 0, 1, and 2 are complete. The application now has a minimal web
+viewer over the backend vertical slice:
 
 ```text
 create endpoint -> receive webhook -> persist request -> retrieve request
@@ -40,6 +41,14 @@ historical milestone anchors, not a substitute for live state.
 - Text preview for textual payloads and Base64 representation for every body.
 - Configurable body limit, defaulting to 256 KB.
 - Actuator health and info exposure.
+- Next.js web viewer for anonymous endpoint creation.
+- Browser-local storage of the endpoint ID and viewer token for the active
+  anonymous session.
+- Copyable webhook URL, captured-request list, and request-detail view.
+- Captured textual bodies are rendered as text inside a `pre` element; captured
+  HTML is never inserted into the page as executable or rendered markup.
+- A same-origin Next.js proxy routes viewer API calls to the Spring API without
+  adding a broad CORS policy to the backend.
 
 ## API Surface
 
@@ -87,6 +96,19 @@ The required non-POST methods are mapped but have not each been exercised by an
 integration test. No homelab, staging, production, or visual browser path has
 been verified.
 
+Milestone 2 web verification on 2026-08-24:
+
+```bash
+cd apps/web && npm run build
+npm run start -- --port 3010
+curl -sS -D - http://127.0.0.1:3010/
+```
+
+Result: the production build completed successfully, and the local-only smoke
+request returned HTTP 200 with the expected page title and introductory
+content. The interactive create, copy, proxy, list, and detail flows have not
+been exercised against a running API in a browser.
+
 ## Decisions to Preserve
 
 - Keep public webhook addressing separate from private viewer authorization.
@@ -99,7 +121,6 @@ been verified.
 
 ## Known Limitations
 
-- `apps/web` has not been implemented.
 - No SSE/live updates.
 - Expiry is enforced on capture and retrieval, but expired rows are not yet
   physically deleted by a scheduled cleanup job.
@@ -115,15 +136,17 @@ must be addressed before public exposure as appropriate.
 
 ## Recommended Next Milestone
 
-Milestone 2: minimal Next.js web experience.
+Milestone 3: operational safeguards before public exposure.
 
 Smallest useful scope:
 
-1. Create an endpoint from the browser.
-2. Store the endpoint ID and viewer token locally for the anonymous session.
-3. Show the public webhook URL with copy support.
-4. List captured requests.
-5. Show a safe request-detail view without rendering captured HTML.
+1. Define and implement bounded retention (scheduled deletion of expired rows
+   and a per-endpoint request cap).
+2. Add focused tests for all supported webhook methods and cleanup behavior.
+3. Add local development instructions that run API and web together, then
+   exercise the browser flow against that API.
+4. Add deployment and exposure controls only after an explicit hosting target
+   is selected and audited.
 
 Do not add accounts, SSE, distributed infrastructure, or broad portfolio polish
 as part of this milestone.
