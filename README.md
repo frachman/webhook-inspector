@@ -5,7 +5,7 @@ A disposable endpoint for seeing exactly what an application sends.
 The repository is a small monorepo:
 
 - `apps/api` — Spring Boot API and webhook receiver
-- `apps/web` — reserved for the minimal Next.js viewer in Milestone 2
+- `apps/web` — minimal Next.js viewer
 
 ## Run the API
 
@@ -22,6 +22,30 @@ mvn -f apps/api/pom.xml spring-boot:run
 
 Flyway applies the schema at startup. No credentials belong in this repository.
 
+### Disposable local PostgreSQL
+
+For an isolated development database, start PostgreSQL in a disposable local
+container. `trust` authentication is appropriate only because this binds to
+localhost and the container is removed when stopped:
+
+```bash
+docker run --rm --name webhook-inspector-postgres \
+  --publish 127.0.0.1:55432:5432 \
+  --env POSTGRES_DB=webhook_dev \
+  --env POSTGRES_USER=webhook_dev \
+  --env POSTGRES_HOST_AUTH_METHOD=trust \
+  postgres:17-alpine
+```
+
+In another terminal, run the API against it:
+
+```bash
+export DB_URL='jdbc:postgresql://127.0.0.1:55432/webhook_dev'
+export DB_USERNAME='webhook_dev'
+export DB_PASSWORD=''
+mvn -f apps/api/pom.xml spring-boot:run
+```
+
 ## Run the web viewer
 
 In a second terminal, after the API is running:
@@ -37,6 +61,10 @@ Open `http://localhost:3000`. The web server proxies API calls to
 see `apps/web/.env.example`. The browser retains the current endpoint ID and
 viewer token in local storage, so use **Forget this endpoint** on a shared
 machine.
+
+With the disposable database and API above running, this starts the complete
+local development stack. The web server proxies viewer API calls to the local
+API, so no browser CORS configuration is needed.
 
 ## Vertical-slice API
 

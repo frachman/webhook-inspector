@@ -130,6 +130,16 @@ CI workflow verification on 2026-08-24:
 - The first remote run (`32739823084`) completed successfully: both API tests
   and the web build passed on GitHub-hosted runners.
 
+Local web/API smoke verification on 2026-08-24:
+
+- A temporary PostgreSQL 17 container, Spring API, and Next.js development
+  server were run together on local-only ports.
+- The web proxy sequence passed: endpoint creation, POST capture, and
+  authenticated request listing.
+- An interactive visual browser session was not available in this environment,
+  so copy support, local-storage restoration, and request-detail interaction
+  remain unverified in a browser.
+
 ## Decisions to Preserve
 
 - Keep public webhook addressing separate from private viewer authorization.
@@ -160,8 +170,9 @@ exposure.
 
 Smallest useful scope:
 
-1. Add local development instructions that run API and web together, then
-   exercise the browser flow against that API.
+1. Run the pending interactive browser checks against the documented local
+   stack: endpoint creation, copy support, local-storage restoration, request
+   list refresh, and safe request-detail display.
 2. Add deployment and exposure controls only after an explicit hosting target
    is selected and audited.
 
