@@ -3,6 +3,7 @@ package id.farandy.webhookinspector;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -21,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.http.HttpMethod;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -164,6 +166,27 @@ class WebhookVerticalSliceIntegrationTest {
         mockMvc.perform(get("/api/endpoints/{endpointId}/requests/{requestId}", endpointId, firstId)
                         .header("Authorization", "Bearer " + viewerToken))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void capturesEverySupportedWebhookMethod() throws Exception {
+        for (HttpMethod method : List.of(HttpMethod.GET, HttpMethod.PUT, HttpMethod.PATCH, HttpMethod.DELETE)) {
+            MvcResult createResult = mockMvc.perform(post("/api/endpoints")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("{}"))
+                    .andReturn();
+            String webhookUrl = JsonPath.read(createResult.getResponse().getContentAsString(), "$.webhookUrl");
+            String publicPath = webhookUrl.substring(webhookUrl.indexOf("/w/"));
+
+            mockMvc.perform(request(method, publicPath)
+                            .contentType(MediaType.TEXT_PLAIN)
+                            .content(method.name()))
+                    .andExpect(status().isAccepted());
+        }
+
+        org.assertj.core.api.Assertions.assertThat(capturedRequestRepository.findAll())
+                .extracting(CapturedRequestEntity::getMethod)
+                .containsExactlyInAnyOrder("GET", "PUT", "PATCH", "DELETE");
     }
 
     @Test

@@ -90,7 +90,7 @@ Equivalent Maven command used during Milestone 1:
 mvn -f apps/api/pom.xml clean test
 ```
 
-Result: 5 tests passed against an isolated PostgreSQL 17 Testcontainer.
+Result: 6 tests passed against an isolated PostgreSQL 17 Testcontainer.
 
 Covered:
 
@@ -101,6 +101,7 @@ Covered:
 - oversized-body rejection.
 - per-endpoint request-cap eviction.
 - removal of expired endpoints and their captured requests.
+- GET, POST, PUT, PATCH, and DELETE webhook capture mappings.
 
 The required non-POST methods are mapped but have not each been exercised by an
 integration test. No homelab, staging, production, or visual browser path has
@@ -159,11 +160,9 @@ exposure.
 
 Smallest useful scope:
 
-1. Add focused integration coverage for GET, PUT, PATCH, and DELETE webhook
-   capture mappings.
-2. Add local development instructions that run API and web together, then
+1. Add local development instructions that run API and web together, then
    exercise the browser flow against that API.
-3. Add deployment and exposure controls only after an explicit hosting target
+2. Add deployment and exposure controls only after an explicit hosting target
    is selected and audited.
 
 Do not add accounts, SSE, distributed infrastructure, or broad portfolio polish
