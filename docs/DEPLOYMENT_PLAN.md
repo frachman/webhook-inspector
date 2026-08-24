@@ -41,6 +41,12 @@ On 2026-08-24, the operator confirmed:
 - No `/srv/hookbin` directory exists and no Hookbin Docker volume exists.
 - Current named volumes are Caddy and RateCraft only; do not reuse
   `ratecraft-postgres-data`.
+- `/srv/infra/Caddyfile` is a single-file bind mount into the Caddy container.
+  Do not atomically replace it with `mv`; preserve its inode for edits and
+  reload, or explicitly recreate the Caddy service after a pathname replacement.
+- No application PostgreSQL backup or restore procedure was found. The only
+  scheduled backup timer is `dpkg-db-backup`; static Caddy and Compose repair
+  backups are not a database recovery strategy.
 
 ## Required Preflight
 
@@ -71,8 +77,9 @@ After preflight acceptance and a backup, the first release should:
 4. Add a single `hookbin.farandy.id` Caddy site block that reverse-proxies to
    that alias; configure trusted forwarded-header handling in the API before
    relying on externally generated webhook URLs.
-5. Reload Caddy using its verified operator procedure, preserving the known
-   single-file bind-mount constraint.
+5. Back up the existing Caddyfile, edit its existing inode, validate from the
+   Caddy container, then reload Caddy using its verified operator procedure.
+   Do not use atomic replacement followed only by reload.
 6. Verify DNS, TLS, public endpoint creation, webhook capture, viewer access,
    backups, and rollback readiness.
 
