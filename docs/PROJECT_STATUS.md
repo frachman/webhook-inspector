@@ -177,6 +177,10 @@ Smallest useful scope:
 3. Make the first deployment only after the plan, backup readiness, and exact
    target identity are accepted.
 
+Current deployment-planning evidence is in `docs/DEPLOYMENT_PLAN.md`. The
+candidate Mikrolyt VPS has a compatible Caddy/Docker topology, but privileged
+preflight access is pending and `hookbin.farandy.id` has no public DNS record.
+
 Do not add accounts, SSE, distributed infrastructure, or broad portfolio polish
 as part of this milestone.
 
