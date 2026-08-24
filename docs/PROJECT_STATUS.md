@@ -44,7 +44,8 @@ historical milestone anchors, not a substitute for live state.
 - Actuator health and info exposure.
 - Next.js web viewer for anonymous endpoint creation.
 - Browser-local storage of the endpoint ID and viewer token for the active
-  anonymous session.
+  anonymous session, with an in-memory fallback for browsers that block local
+  storage.
 - Copyable webhook URL, captured-request list, and request-detail view.
 - Captured textual bodies are rendered as text inside a `pre` element; captured
   HTML is never inserted into the page as executable or rendered markup.

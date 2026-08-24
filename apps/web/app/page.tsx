@@ -52,14 +52,14 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [storageAvailable, setStorageAvailable] = useState(true);
 
   useEffect(() => {
-    const saved = window.localStorage.getItem(storageKey);
-    if (!saved) return;
     try {
-      setEndpoint(JSON.parse(saved) as Endpoint);
+      const saved = window.localStorage.getItem(storageKey);
+      if (saved) setEndpoint(JSON.parse(saved) as Endpoint);
     } catch {
-      window.localStorage.removeItem(storageKey);
+      setStorageAvailable(false);
     }
   }, []);
 
@@ -95,7 +95,11 @@ export default function Home() {
       });
       if (!response.ok) throw new Error(await responseError(response));
       const created = (await response.json()) as Endpoint;
-      window.localStorage.setItem(storageKey, JSON.stringify(created));
+      try {
+        window.localStorage.setItem(storageKey, JSON.stringify(created));
+      } catch {
+        setStorageAvailable(false);
+      }
       setRequests([]);
       setEndpoint(created);
     } catch (cause) {
@@ -131,7 +135,11 @@ export default function Home() {
   }
 
   function forgetEndpoint() {
-    window.localStorage.removeItem(storageKey);
+    try {
+      window.localStorage.removeItem(storageKey);
+    } catch {
+      setStorageAvailable(false);
+    }
     setEndpoint(null);
     setRequests([]);
     setSelectedRequest(null);
@@ -165,7 +173,11 @@ export default function Home() {
             <code>{endpoint.webhookUrl}</code>
             <button type="button" onClick={() => void copyWebhookUrl()}>{copied ? "Copied" : "Copy"}</button>
           </div>
-          <p className="muted">This private viewer expires {formatDate(endpoint.expiresAt)}. Its credentials stay only in this browser.</p>
+          <p className="muted">
+            {storageAvailable
+              ? `This private viewer expires ${formatDate(endpoint.expiresAt)}. Its credentials stay only in this browser.`
+              : "This browser blocks local storage, so this endpoint will be forgotten when the page reloads."}
+          </p>
         </section>
       )}
 
