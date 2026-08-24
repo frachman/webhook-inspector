@@ -81,6 +81,12 @@ public class EndpointService {
         EndpointEntity endpoint = endpointRepository.findByPublicKeyAndExpiresAtAfter(publicKey, now)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Endpoint not found or expired"));
 
+        if (requestRepository.countByEndpointId(endpoint.getId()) >= properties.maxRequestsPerEndpoint()) {
+            CapturedRequestEntity oldest = requestRepository.findFirstByEndpointIdOrderByCreatedAtAsc(endpoint.getId())
+                    .orElseThrow(() -> new IllegalStateException("Endpoint request count is inconsistent"));
+            requestRepository.delete(oldest);
+        }
+
         CapturedRequestEntity captured = new CapturedRequestEntity(
                 UUID.randomUUID(),
                 endpoint.getId(),

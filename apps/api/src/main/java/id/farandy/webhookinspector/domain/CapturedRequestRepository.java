@@ -10,4 +10,8 @@ public interface CapturedRequestRepository extends JpaRepository<CapturedRequest
     List<CapturedRequestEntity> findAllByEndpointIdAndExpiresAtAfterOrderByCreatedAtDesc(UUID endpointId, Instant now);
 
     Optional<CapturedRequestEntity> findByIdAndEndpointIdAndExpiresAtAfter(UUID id, UUID endpointId, Instant now);
+
+    long countByEndpointId(UUID endpointId);
+
+    Optional<CapturedRequestEntity> findFirstByEndpointIdOrderByCreatedAtAsc(UUID endpointId);
 }

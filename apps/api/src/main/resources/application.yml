@@ -21,3 +21,5 @@ management:
 webhook:
   default-ttl-hours: ${WEBHOOK_DEFAULT_TTL_HOURS:24}
   max-body-bytes: ${WEBHOOK_MAX_BODY_BYTES:262144}
+  max-requests-per-endpoint: ${WEBHOOK_MAX_REQUESTS_PER_ENDPOINT:100}
+  cleanup-interval: ${WEBHOOK_CLEANUP_INTERVAL:PT1H}

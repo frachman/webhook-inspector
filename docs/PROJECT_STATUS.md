@@ -10,8 +10,9 @@ inspect them through a private viewer.
 
 ## Current State
 
-Milestones 0, 1, and 2 are complete. The application now has a minimal web
-viewer over the backend vertical slice:
+Milestones 0, 1, and 2 are complete, along with the retention-controls portion
+of Milestone 3. The application now has a minimal web viewer over the backend
+vertical slice:
 
 ```text
 create endpoint -> receive webhook -> persist request -> retrieve request
@@ -52,6 +53,10 @@ historical milestone anchors, not a substitute for live state.
 - GitHub Actions CI workflow for pushes and pull requests to `main`: Maven API
   integration tests on JDK 17, plus a reproducible Next.js production build on
   Node.js 24.
+- Configurable per-endpoint captured-request cap, defaulting to 100; a capture
+  at capacity evicts that endpoint's oldest request.
+- Scheduled physical deletion of expired endpoints (and their requests through
+  the database foreign-key cascade), defaulting to an hourly interval.
 
 ## API Surface
 
@@ -85,7 +90,7 @@ Equivalent Maven command used during Milestone 1:
 mvn -f apps/api/pom.xml clean test
 ```
 
-Result: 3 tests passed against an isolated PostgreSQL 17 Testcontainer.
+Result: 5 tests passed against an isolated PostgreSQL 17 Testcontainer.
 
 Covered:
 
@@ -94,6 +99,8 @@ Covered:
 - authenticated request list and detail retrieval;
 - invalid viewer-token rejection;
 - oversized-body rejection.
+- per-endpoint request-cap eviction.
+- removal of expired endpoints and their captured requests.
 
 The required non-POST methods are mapped but have not each been exercised by an
 integration test. No homelab, staging, production, or visual browser path has
@@ -119,8 +126,8 @@ CI workflow verification on 2026-08-24:
   PostgreSQL Testcontainer integration tests passed.
 - `npm ci --prefix apps/web` and `npm run build --prefix apps/web` passed
   locally.
-- The workflow has not run on GitHub yet; it requires a separately approved
-  push before remote execution can be claimed.
+- The first remote run (`32739823084`) completed successfully: both API tests
+  and the web build passed on GitHub-hosted runners.
 
 ## Decisions to Preserve
 
@@ -131,16 +138,14 @@ CI workflow verification on 2026-08-24:
 - Use PostgreSQL-specific integration tests for schema and JSONB behavior.
 - Production must not depend on homelab availability.
 - Keep the initial application single-node and monolithic.
+- Keep retention limits configurable through environment variables; do not
+  allow an endpoint to retain unbounded captured bodies.
 
 ## Known Limitations
 
 - No SSE/live updates.
-- Expiry is enforced on capture and retrieval, but expired rows are not yet
-  physically deleted by a scheduled cleanup job.
-- No retained-request cap per endpoint.
 - No application-level rate limiting.
 - No staging or production deployment configuration.
-- No CI workflow.
 - Forwarded-header handling for externally generated webhook URLs is not yet
   configured or production-tested.
 
@@ -149,16 +154,16 @@ must be addressed before public exposure as appropriate.
 
 ## Recommended Next Milestone
 
-Milestone 3: operational safeguards before public exposure.
+Milestone 3: complete the remaining operational safeguards before public
+exposure.
 
 Smallest useful scope:
 
-1. Define and implement bounded retention (scheduled deletion of expired rows
-   and a per-endpoint request cap).
-2. Add focused tests for all supported webhook methods and cleanup behavior.
-3. Add local development instructions that run API and web together, then
+1. Add focused integration coverage for GET, PUT, PATCH, and DELETE webhook
+   capture mappings.
+2. Add local development instructions that run API and web together, then
    exercise the browser flow against that API.
-4. Add deployment and exposure controls only after an explicit hosting target
+3. Add deployment and exposure controls only after an explicit hosting target
    is selected and audited.
 
 Do not add accounts, SSE, distributed infrastructure, or broad portfolio polish

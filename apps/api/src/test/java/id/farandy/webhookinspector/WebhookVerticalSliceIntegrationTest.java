@@ -7,8 +7,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.jayway.jsonpath.JsonPath;
+import id.farandy.webhookinspector.domain.CapturedRequestEntity;
 import id.farandy.webhookinspector.domain.CapturedRequestRepository;
+import id.farandy.webhookinspector.domain.EndpointEntity;
 import id.farandy.webhookinspector.domain.EndpointRepository;
+import id.farandy.webhookinspector.service.RetentionService;
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +43,7 @@ class WebhookVerticalSliceIntegrationTest {
         registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
         registry.add("spring.datasource.username", POSTGRES::getUsername);
         registry.add("spring.datasource.password", POSTGRES::getPassword);
+        registry.add("webhook.max-requests-per-endpoint", () -> 2);
     }
 
     @Autowired
@@ -46,6 +54,9 @@ class WebhookVerticalSliceIntegrationTest {
 
     @Autowired
     EndpointRepository endpointRepository;
+
+    @Autowired
+    RetentionService retentionService;
 
     MockMvc mockMvc;
 
@@ -125,5 +136,72 @@ class WebhookVerticalSliceIntegrationTest {
                         .contentType(MediaType.APPLICATION_OCTET_STREAM)
                         .content(new byte[262_145]))
                 .andExpect(status().isContentTooLarge());
+    }
+
+    @Test
+    void retainsOnlyTheConfiguredNumberOfRequestsPerEndpoint() throws Exception {
+        MvcResult createResult = mockMvc.perform(post("/api/endpoints")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andReturn();
+        String createJson = createResult.getResponse().getContentAsString();
+        String endpointId = JsonPath.read(createJson, "$.endpointId");
+        String viewerToken = JsonPath.read(createJson, "$.viewerToken");
+        String webhookUrl = JsonPath.read(createJson, "$.webhookUrl");
+        String publicPath = webhookUrl.substring(webhookUrl.indexOf("/w/"));
+
+        String firstId = capture(publicPath, "first");
+        String secondId = capture(publicPath, "second");
+        String thirdId = capture(publicPath, "third");
+
+        mockMvc.perform(get("/api/endpoints/{endpointId}/requests", endpointId)
+                        .header("Authorization", "Bearer " + viewerToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[?(@.id == '" + secondId + "')]").exists())
+                .andExpect(jsonPath("$[?(@.id == '" + thirdId + "')]").exists());
+
+        mockMvc.perform(get("/api/endpoints/{endpointId}/requests/{requestId}", endpointId, firstId)
+                        .header("Authorization", "Bearer " + viewerToken))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void removesExpiredEndpointsAndTheirCapturedRequests() {
+        Instant expiredAt = Instant.now().minusSeconds(60);
+        UUID endpointId = UUID.randomUUID();
+        endpointRepository.save(new EndpointEntity(
+                endpointId,
+                "expired-key",
+                new byte[32],
+                expiredAt.minusSeconds(60),
+                expiredAt));
+        UUID requestId = UUID.randomUUID();
+        capturedRequestRepository.save(new CapturedRequestEntity(
+                requestId,
+                endpointId,
+                "POST",
+                "/w/expired-key",
+                null,
+                Map.of(),
+                new byte[0],
+                null,
+                0,
+                expiredAt.minusSeconds(30),
+                expiredAt));
+
+        retentionService.cleanupExpired();
+
+        org.assertj.core.api.Assertions.assertThat(endpointRepository.existsById(endpointId)).isFalse();
+        org.assertj.core.api.Assertions.assertThat(capturedRequestRepository.existsById(requestId)).isFalse();
+    }
+
+    private String capture(String publicPath, String value) throws Exception {
+        MvcResult result = mockMvc.perform(post(publicPath)
+                        .contentType(MediaType.TEXT_PLAIN)
+                        .content(value))
+                .andExpect(status().isAccepted())
+                .andReturn();
+        return JsonPath.read(result.getResponse().getContentAsString(), "$.requestId");
     }
 }
