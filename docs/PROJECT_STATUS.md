@@ -136,9 +136,10 @@ Local web/API smoke verification on 2026-08-24:
   server were run together on local-only ports.
 - The web proxy sequence passed: endpoint creation, POST capture, and
   authenticated request listing.
-- An interactive visual browser session was not available in this environment,
-  so copy support, local-storage restoration, and request-detail interaction
-  remain unverified in a browser.
+- The initial viewer render was visually checked in a browser. That browser
+  connection did not deliver click events, even after retrying in a fresh tab,
+  so copy support, local-storage restoration, refresh, and request-detail
+  interaction remain unverified in a browser.
 
 ## Decisions to Preserve
 
