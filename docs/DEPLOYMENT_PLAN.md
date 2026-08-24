@@ -9,11 +9,11 @@ Status: planning only — no infrastructure change has been made.
 | Intended public hostname | KNOWN | `hookbin.farandy.id` |
 | Candidate host | KNOWN | SSH alias `mikrolyt-vps`, hostname `mikrolyt-us-west-1` |
 | Runtime resources | KNOWN | Ubuntu 22.04; approximately 42 GB disk and 2 GB RAM available during the read-only audit |
-| Reverse proxy pattern | KNOWN | Containerized Caddy with `/srv/infra/Caddyfile`; existing `ratecraft.farandy.id` proxies to a Docker-network alias |
-| External Docker network | KNOWN | Existing deployment configuration expects external network `web` |
-| PostgreSQL | ASSUMED | Must be a dedicated container and named volume; privileged Docker inspection is still required to confirm current state |
+| Reverse proxy pattern | KNOWN | Containerized Caddy owns host ports 80/443; `/srv/infra/Caddyfile` includes an existing Docker-network alias upstream |
+| External Docker network | KNOWN | `web` contains Caddy and `ratecraft-web-1`; a Hookbin web upstream can join with a unique alias |
+| PostgreSQL | KNOWN | Existing PostgreSQL is dedicated to RateCraft; Hookbin must use a separate container and new named volume |
 | DNS for `hookbin.farandy.id` | BLOCKED | No public A or AAAA record resolved on 2026-08-24 |
-| Privileged deployment access | BLOCKED | `deploy` has no passwordless sudo and no Docker-group access |
+| Privileged deployment access | OPERATOR-ASSISTED | `deploy` has no passwordless sudo or Docker-group access; operator is available for interactive sudo |
 
 ## Intended Topology
 
@@ -29,6 +29,18 @@ Internet
 Only Caddy should publish ports 80 and 443. The API and PostgreSQL must not be
 published directly to the host. The web container should be the Caddy upstream;
 it proxies viewer API calls to the API over the private application network.
+
+## Completed Privileged Read-only Audit
+
+On 2026-08-24, the operator confirmed:
+
+- Caddy is the only container publishing 80 and 443; UFW permits only 22, 80,
+  and 443 inbound.
+- Existing direct host publications 8080 and 8090 belong to Shlink. Hookbin
+  must not use either port.
+- No `/srv/hookbin` directory exists and no Hookbin Docker volume exists.
+- Current named volumes are Caddy and RateCraft only; do not reuse
+  `ratecraft-postgres-data`.
 
 ## Required Preflight
 

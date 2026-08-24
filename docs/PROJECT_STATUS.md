@@ -179,7 +179,8 @@ Smallest useful scope:
 
 Current deployment-planning evidence is in `docs/DEPLOYMENT_PLAN.md`. The
 candidate Mikrolyt VPS has a compatible Caddy/Docker topology, but privileged
-preflight access is pending and `hookbin.farandy.id` has no public DNS record.
+preflight access requires operator-assisted sudo and `hookbin.farandy.id` has
+no public DNS record.
 
 Do not add accounts, SSE, distributed infrastructure, or broad portfolio polish
 as part of this milestone.
