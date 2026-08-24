@@ -5,6 +5,7 @@ import static id.farandy.webhookinspector.api.EndpointApi.CreateEndpointResponse
 import static id.farandy.webhookinspector.api.EndpointApi.RequestDetail;
 import static id.farandy.webhookinspector.api.EndpointApi.RequestSummary;
 
+import id.farandy.webhookinspector.WebhookProperties;
 import id.farandy.webhookinspector.service.EndpointService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -25,14 +26,17 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 public class EndpointController {
 
     private final EndpointService endpointService;
+    private final WebhookProperties properties;
 
-    public EndpointController(EndpointService endpointService) {
+    public EndpointController(EndpointService endpointService, WebhookProperties properties) {
         this.endpointService = endpointService;
+        this.properties = properties;
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public CreateEndpointResponse create(@Valid @RequestBody CreateEndpointRequest request) {
-        String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
+        String detectedBaseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
+        String baseUrl = properties.publicBaseUrl().isEmpty() ? detectedBaseUrl : properties.publicBaseUrl();
         return endpointService.create(request.ttlHours(), baseUrl);
     }
 

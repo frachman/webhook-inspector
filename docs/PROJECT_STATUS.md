@@ -166,8 +166,9 @@ Local web/API smoke verification on 2026-08-24:
 - No SSE/live updates.
 - No application-level rate limiting.
 - No staging or production deployment configuration.
-- Forwarded-header handling for externally generated webhook URLs is not yet
-  configured or production-tested.
+- Public DNS/TLS, backup/restore, and production verification remain pending.
+- The deployment must set `WEBHOOK_PUBLIC_BASE_URL` to the public HTTPS origin;
+  it has not yet been exercised in production.
 
 These limitations are acceptable for the completed backend vertical slice but
 must be addressed before public exposure as appropriate.
@@ -190,10 +191,10 @@ candidate Mikrolyt VPS has a compatible Caddy/Docker topology, but privileged
 preflight access requires operator-assisted sudo and `hookbin.farandy.id` has
 no public DNS record.
 
-The repository now has the local delivery artifacts in `deploy/`, but they
-have not been pushed, published to GHCR, or deployed. Backup destination,
-GHCR package visibility or VPS pull authorization, DNS, and the approved
-server change record remain required before first exposure.
+The repository has delivery artifacts in `deploy/`, and the immutable GHCR
+images for commit `c4a2419` were published and verified anonymously pullable.
+They have not been deployed. Backup destination, DNS, and the approved server
+change record remain required before first exposure.
 
 Do not add accounts, SSE, distributed infrastructure, or broad portfolio polish
 as part of this milestone.

@@ -23,3 +23,4 @@ webhook:
   max-body-bytes: ${WEBHOOK_MAX_BODY_BYTES:262144}
   max-requests-per-endpoint: ${WEBHOOK_MAX_REQUESTS_PER_ENDPOINT:100}
   cleanup-interval: ${WEBHOOK_CLEANUP_INTERVAL:PT1H}
+  public-base-url: ${WEBHOOK_PUBLIC_BASE_URL:}

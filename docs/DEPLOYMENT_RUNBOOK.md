@@ -64,7 +64,8 @@ The repository supplies the following files for review before Phase 3:
 - `deploy/docker-compose.production.yml` keeps PostgreSQL and API private and
   attaches only the web container to the existing external `web` network.
 - `deploy/hookbin.env.example` is a non-secret reference. Copy it to
-  `/srv/hookbin/.env` and replace values there only.
+  `/srv/hookbin/.env` and replace values there only. Set
+  `HOOKBIN_PUBLIC_BASE_URL` to the approved public HTTPS origin.
 
 Before allowing a first image push, confirm that the GitHub repository permits
 GitHub Actions to write packages and decide whether the resulting GHCR packages

@@ -46,6 +46,7 @@ class WebhookVerticalSliceIntegrationTest {
         registry.add("spring.datasource.username", POSTGRES::getUsername);
         registry.add("spring.datasource.password", POSTGRES::getPassword);
         registry.add("webhook.max-requests-per-endpoint", () -> 2);
+        registry.add("webhook.public-base-url", () -> "https://hookbin.example.test");
     }
 
     @Autowired
@@ -84,6 +85,7 @@ class WebhookVerticalSliceIntegrationTest {
         String endpointId = JsonPath.read(createJson, "$.endpointId");
         String viewerToken = JsonPath.read(createJson, "$.viewerToken");
         String webhookUrl = JsonPath.read(createJson, "$.webhookUrl");
+        org.assertj.core.api.Assertions.assertThat(webhookUrl).startsWith("https://hookbin.example.test/w/");
         String publicPath = webhookUrl.substring(webhookUrl.indexOf("/w/"));
 
         MvcResult captureResult = mockMvc.perform(post(publicPath + "?source=integration")

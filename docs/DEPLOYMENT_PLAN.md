@@ -77,8 +77,9 @@ After preflight acceptance and a backup, the first release should:
 3. Attach only the web container to the existing `web` network with a unique
    Caddy alias.
 4. Add a single `hookbin.farandy.id` Caddy site block that reverse-proxies to
-   that alias; configure trusted forwarded-header handling in the API before
-   relying on externally generated webhook URLs.
+   that alias. Set `HOOKBIN_PUBLIC_BASE_URL=https://hookbin.farandy.id` in the
+   server-only environment file so generated webhook URLs never depend on a
+   private proxy hop's forwarded headers.
 5. Back up the existing Caddyfile, edit its existing inode, validate from the
    Caddy container, then reload Caddy using its verified operator procedure.
    Do not use atomic replacement followed only by reload.

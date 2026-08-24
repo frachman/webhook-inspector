@@ -26,7 +26,7 @@ services:
       DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-hookbin}
       DB_USERNAME: ${POSTGRES_USER:-hookbin}
       DB_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in the server-only env file}
-      SERVER_FORWARD_HEADERS_STRATEGY: framework
+      WEBHOOK_PUBLIC_BASE_URL: ${HOOKBIN_PUBLIC_BASE_URL:?set HOOKBIN_PUBLIC_BASE_URL in the server-only env file}
     depends_on:
       postgres:
         condition: service_healthy
