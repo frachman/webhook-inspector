@@ -96,6 +96,13 @@ Latest CI and delivery verification on 2026-08-26:
   packages and verified anonymously pullable;
 - the production-origin configuration is covered by an API test using a fixed
   public HTTPS origin.
+- the first private production stack started with healthy PostgreSQL, API, and
+  web services, with no Hookbin host ports published;
+- the real database recovery rehearsal passed: an encrypted `pg_dump -Fc` was
+  transferred off-host, checksum-verified, and restored to isolated PostgreSQL;
+- `https://hookbin.farandy.id/` returned HTTP 200 through Cloudflare and Caddy
+  after Caddy obtained its certificate. Existing primary sites returned HTTP
+  200 in read-only regression checks.
 
 Most recent full verification on 2026-08-24:
 
@@ -176,11 +183,11 @@ Local web/API smoke verification on 2026-08-24:
 - No SSE/live updates.
 - No application-level rate limiting.
 - No staging deployment.
-- Public DNS/TLS, production deployment, and production-path verification
-  remain pending.
-- An encrypted, restricted off-host backup transport and homelab decryption
-  path passed with synthetic content. A real Hookbin PostgreSQL `pg_dump -Fc`
-  and isolated restore rehearsal remain required before public ingress.
+- Public browser acceptance and production webhook-capture verification remain
+  pending.
+- The encrypted off-host backup transport and real PostgreSQL restore rehearsal
+  passed before public ingress. Backup automation, retention, and alerting are
+  still manual and need a future operational decision.
 - The deployment must set `WEBHOOK_PUBLIC_BASE_URL` to the public HTTPS origin;
   it has not yet been exercised in production.
 
@@ -207,9 +214,11 @@ no public DNS record.
 
 The repository has delivery artifacts in `deploy/`, and the immutable GHCR
 images for commit `77cfae8c48e206273b09450bb91be1e537b3ad07` were published and
-verified anonymously pullable. They have not been deployed. Backup destination
-and encrypted transport are prepared, but the real dump/restore rehearsal,
-DNS, and approved server change record remain required before first exposure.
+verified anonymously pullable, then deployed as the first release on
+2026-08-26. The private stack, encrypted database restore rehearsal, Caddy
+ingress, certificate issuance, and public home-page smoke check are verified.
+Browser acceptance of endpoint creation and webhook capture is the remaining
+release check.
 
 Do not add accounts, SSE, distributed infrastructure, or broad portfolio polish
 as part of this milestone.

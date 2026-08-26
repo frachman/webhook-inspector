@@ -88,8 +88,10 @@ After the private Compose stack is running but before DNS or Caddy ingress:
    result. Do not commit webhook data, dump contents, private keys, or
    credentials.
 
-The transport and decryption path has passed with synthetic content. This does
-not substitute for a database backup and restore rehearsal.
+The transport and decryption path first passed with synthetic content. The
+first-release rehearsal then passed with a real Hookbin `pg_dump -Fc`: encrypted
+transfer, checksum verification, decryption, and restore to an isolated
+PostgreSQL instance all succeeded. Retain this procedure for future releases.
 
 ## Phase 3 — Change Proposal Gate
 

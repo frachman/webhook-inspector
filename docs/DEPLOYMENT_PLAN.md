@@ -1,7 +1,7 @@
 # Hookbin Deployment Plan
 
-Status: preflight partially complete. No Hookbin application, DNS, or Caddy
-configuration has been changed.
+Status: first release deployed on 2026-08-26. Public ingress and the initial
+recovery rehearsal are verified; end-to-end browser acceptance remains pending.
 
 ## Target and Evidence
 
@@ -13,11 +13,11 @@ configuration has been changed.
 | Reverse proxy pattern | KNOWN | Containerized Caddy owns host ports 80/443; `/srv/infra/Caddyfile` includes an existing Docker-network alias upstream |
 | External Docker network | KNOWN | `web` contains Caddy and `ratecraft-web-1`; a Hookbin web upstream can join with a unique alias |
 | PostgreSQL | KNOWN | Existing PostgreSQL is dedicated to RateCraft; Hookbin must use a separate container and new named volume |
-| DNS for `hookbin.farandy.id` | BLOCKED | No public A or AAAA record resolved during the 2026-08-25 recheck |
+| Public hostname | VERIFIED | `https://hookbin.farandy.id/` returned HTTP 200 through Cloudflare and Caddy on 2026-08-26 |
 | Privileged deployment access | OPERATOR-ASSISTED | `deploy` has no passwordless sudo or Docker-group access; operator is available for interactive sudo |
 | Immutable delivery images | KNOWN | GitHub Actions published and anonymous pulls verified for API and web images at `sha-77cfae8c48e206273b09450bb91be1e537b3ad07` |
 | Encrypted off-host transport | PROVEN | Restricted SFTP transfer to a user-controlled homelab and decryption with a homelab-only recovery key passed using synthetic content |
-| Database recovery rehearsal | PENDING | Requires a deployed Hookbin PostgreSQL instance, real `pg_dump -Fc`, encrypted transfer, and isolated `pg_restore` verification |
+| Database recovery rehearsal | VERIFIED | Real `pg_dump -Fc` was encrypted on the VPS, checksum-verified after restricted SFTP transfer, and restored into an isolated PostgreSQL instance on the homelab |
 
 ## Intended Topology
 
@@ -51,6 +51,25 @@ On 2026-08-24, the operator confirmed:
 - No application PostgreSQL backup or restore procedure was found. The only
   scheduled backup timer is `dpkg-db-backup`; static Caddy and Compose repair
   backups are not a database recovery strategy.
+
+## Completed First-Release Evidence
+
+On 2026-08-26, the first Hookbin release was started with the immutable API and
+web images recorded above. PostgreSQL, API, and web health checks became
+healthy without publishing any Hookbin host port. The web service alone joined
+the existing `web` network under the `webhook-inspector-web` alias.
+
+Before public ingress, a real Hookbin PostgreSQL custom-format dump was streamed
+directly into GPG encryption on the VPS, transferred by the restricted SFTP
+account, checksum-verified on the homelab, decrypted into a root-only temporary
+workspace, and restored to an isolated temporary PostgreSQL instance. Flyway
+migration history and core tables were verified after restore. The encrypted
+artifact is retained in root-only verified off-host storage.
+
+The Caddyfile was backed up, edited in place, validated, and reloaded. Caddy
+obtained a certificate for `hookbin.farandy.id`; public HTTPS returned HTTP 200.
+Read-only checks also returned HTTP 200 for `farandy.id`, `mikrolyt.com`, and
+`vindue.id` after the reload.
 
 ## Required Preflight
 

@@ -1,7 +1,7 @@
 # Hookbin First-Release Change Record
 
-Status: draft only. This record is not authorization to modify the VPS, DNS,
-or Caddy.
+Status: implemented on 2026-08-26. This record captures the first release;
+future changes still require their own approval.
 
 ## Scope
 
@@ -55,7 +55,8 @@ Hookbin database content:
    according to the operator's retention policy, and record timestamp,
    checksum, and result without recording payload data.
 
-This must pass before the public DNS record or Caddy site block is added.
+This passed before the Caddy site block was added. The encrypted backup artifact
+and its checksum are retained in root-only verified off-host storage.
 
 ## Rollback
 
