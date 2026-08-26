@@ -5,7 +5,7 @@ COPY apps/web/package.json apps/web/package-lock.json ./
 RUN npm ci
 
 COPY apps/web ./
-ARG API_ORIGIN=http://webhook-inspector-api:8080
+ARG API_ORIGIN=http://api:8080
 ENV API_ORIGIN=$API_ORIGIN
 RUN npm run build
 
