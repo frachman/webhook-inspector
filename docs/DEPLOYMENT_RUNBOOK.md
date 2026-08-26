@@ -37,15 +37,18 @@ Record only the following evidence: Caddy container/project name, `web` network
 membership, public listeners, firewall status, whether `/srv/hookbin` exists,
 and candidate volume names. Do not record container environment values.
 
-## Phase 2 — Decisions Required Before Changes
+## Phase 2 — Confirmed Decisions Before Changes
 
 Confirm these choices explicitly:
 
 1. DNS: create only an IPv4 A record for `hookbin.farandy.id` pointing to the
    Mikrolyt VPS after the host IP is reverified. Do not create AAAA without a
    separate IPv6 audit.
-2. Database backup: choose the encrypted backup destination and the operator
-   who can run a restore test.
+2. Database backup: use a manual encrypted PostgreSQL logical dump transferred
+   through restricted SFTP to user-controlled off-host homelab storage. The
+   homelab recovery key and a restore-capable operator remain outside Git. The
+   actual Hookbin dump and isolated restore rehearsal are required before
+   public ingress.
 3. Deployment ownership: use `/srv/hookbin`, a dedicated Compose project,
    `hookbin-internal` network, and a named PostgreSQL volume. Do not reuse
    another application's database or volume.
@@ -67,10 +70,26 @@ The repository supplies the following files for review before Phase 3:
   `/srv/hookbin/.env` and replace values there only. Set
   `HOOKBIN_PUBLIC_BASE_URL` to the approved public HTTPS origin.
 
-Before allowing a first image push, confirm that the GitHub repository permits
-GitHub Actions to write packages and decide whether the resulting GHCR packages
-will be public (recommended for the VPS pull path) or whether the server will
-hold a narrowly scoped read-only package credential outside Git.
+The GitHub Actions publish workflow has completed successfully for commit
+`77cfae8c48e206273b09450bb91be1e537b3ad07`. Both GHCR packages are public and
+their immutable API and web tags have been verified anonymously pullable. Put
+only those exact image references in the server-only environment file.
+
+## Phase 2.1 — Recovery Rehearsal Gate
+
+After the private Compose stack is running but before DNS or Caddy ingress:
+
+1. Create a real `pg_dump -Fc` from the Hookbin PostgreSQL service.
+2. Encrypt it on the VPS with the configured homelab public key.
+3. Upload it with the restricted backup SFTP account.
+4. Decrypt and restore it on the homelab into an isolated temporary PostgreSQL
+   instance; verify that the restore is readable.
+5. Record only success/failure, artifact timestamp, checksum, and restore
+   result. Do not commit webhook data, dump contents, private keys, or
+   credentials.
+
+The transport and decryption path has passed with synthetic content. This does
+not substitute for a database backup and restore rehearsal.
 
 ## Phase 3 — Change Proposal Gate
 

@@ -1,6 +1,7 @@
 # Hookbin Deployment Plan
 
-Status: planning only — no infrastructure change has been made.
+Status: preflight partially complete. No Hookbin application, DNS, or Caddy
+configuration has been changed.
 
 ## Target and Evidence
 
@@ -12,8 +13,11 @@ Status: planning only — no infrastructure change has been made.
 | Reverse proxy pattern | KNOWN | Containerized Caddy owns host ports 80/443; `/srv/infra/Caddyfile` includes an existing Docker-network alias upstream |
 | External Docker network | KNOWN | `web` contains Caddy and `ratecraft-web-1`; a Hookbin web upstream can join with a unique alias |
 | PostgreSQL | KNOWN | Existing PostgreSQL is dedicated to RateCraft; Hookbin must use a separate container and new named volume |
-| DNS for `hookbin.farandy.id` | BLOCKED | No public A or AAAA record resolved on 2026-08-24 |
+| DNS for `hookbin.farandy.id` | BLOCKED | No public A or AAAA record resolved during the 2026-08-25 recheck |
 | Privileged deployment access | OPERATOR-ASSISTED | `deploy` has no passwordless sudo or Docker-group access; operator is available for interactive sudo |
+| Immutable delivery images | KNOWN | GitHub Actions published and anonymous pulls verified for API and web images at `sha-77cfae8c48e206273b09450bb91be1e537b3ad07` |
+| Encrypted off-host transport | PROVEN | Restricted SFTP transfer to a user-controlled homelab and decryption with a homelab-only recovery key passed using synthetic content |
+| Database recovery rehearsal | PENDING | Requires a deployed Hookbin PostgreSQL instance, real `pg_dump -Fc`, encrypted transfer, and isolated `pg_restore` verification |
 
 ## Intended Topology
 
@@ -59,17 +63,18 @@ On 2026-08-24, the operator confirmed:
 3. Create and review production-only secret material outside Git:
    PostgreSQL password and any deployment environment file. Never put values in
    `.env.example`, repository history, terminal output, or this document.
-4. Define backup and restore evidence before first exposure: PostgreSQL logical
-   dump destination, encryption/access, restore command, and recovery owner.
-5. Build immutable application images and a dedicated Compose stack. The
-   repository provides Dockerfiles, a production Compose template, and a
-   GitHub Actions workflow that publishes SHA-tagged images to GHCR after the
-   normal CI checks pass. Configure the resulting immutable image references
-   only in the server-only `/srv/hookbin/.env` file.
+4. Complete backup and restore evidence before first exposure. The approved
+   design uses a PostgreSQL logical `pg_dump -Fc`, encryption before it leaves
+   the VPS, restricted SFTP transfer to user-controlled off-host storage, and
+   a recovery key held only on the homelab. Run and verify this sequence with
+   actual Hookbin data after the database starts and before public ingress.
+5. Use the published immutable images and a dedicated Compose stack. Configure
+   the exact API and web image references only in the server-only
+   `/srv/hookbin/.env` file.
 
 ## Bounded Deployment Change
 
-After preflight acceptance and a backup, the first release should:
+After preflight acceptance, the first release should:
 
 1. Create a dedicated internal Docker network and named PostgreSQL volume.
 2. Start PostgreSQL, apply Flyway through the API startup, then start API and
@@ -83,8 +88,12 @@ After preflight acceptance and a backup, the first release should:
 5. Back up the existing Caddyfile, edit its existing inode, validate from the
    Caddy container, then reload Caddy using its verified operator procedure.
    Do not use atomic replacement followed only by reload.
-6. Verify DNS, TLS, public endpoint creation, webhook capture, viewer access,
-   backups, and rollback readiness.
+6. Before adding public DNS or Caddy ingress, create a real encrypted database
+   backup, transfer it off-host, restore it into an isolated temporary
+   PostgreSQL instance, and verify the restored database.
+7. Add public ingress only after the recovery rehearsal passes, then verify
+   DNS, TLS, endpoint creation, webhook capture, viewer access, and rollback
+   readiness.
 
 ## Rollback
 
@@ -95,6 +104,7 @@ rollback is unavailable until a second verified release exists.
 
 ## Approval Gate
 
-Before any remote mutation, obtain explicit approval for the exact target,
-DNS record, Caddy edit, Compose files, backup destination, and commands. The
-read-only audit does not authorize any of those changes.
+Before any further remote mutation, obtain explicit approval for the exact
+target, Compose files, backup/restore commands, DNS record, and Caddy edit.
+The completed transport preflight does not authorize application deployment or
+public exposure.

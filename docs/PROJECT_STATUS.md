@@ -1,6 +1,6 @@
 # Webhook Inspector Project Status
 
-Last updated: 2026-08-24
+Last updated: 2026-08-26
 
 ## Mission
 
@@ -66,6 +66,8 @@ historical milestone anchors, not a substitute for live state.
 - CI image-build checks and a separate GHCR publisher that emits API and web
   images tagged with the immutable Git commit SHA only after CI succeeds for a
   `main` commit.
+- Configurable public webhook origin through `WEBHOOK_PUBLIC_BASE_URL`, so the
+  generated capture URL is independent of private proxy hops.
 
 ## API Surface
 
@@ -86,6 +88,14 @@ Authorization: Bearer <viewer-token>
 The viewer token is returned only when an endpoint is created.
 
 ## Verified Evidence
+
+Latest CI and delivery verification on 2026-08-26:
+
+- commit `77cfae8c48e206273b09450bb91be1e537b3ad07` passed GitHub Actions CI;
+- immutable API and web images for that commit were published to public GHCR
+  packages and verified anonymously pullable;
+- the production-origin configuration is covered by an API test using a fixed
+  public HTTPS origin.
 
 Most recent full verification on 2026-08-24:
 
@@ -165,8 +175,12 @@ Local web/API smoke verification on 2026-08-24:
 
 - No SSE/live updates.
 - No application-level rate limiting.
-- No staging or production deployment configuration.
-- Public DNS/TLS, backup/restore, and production verification remain pending.
+- No staging deployment.
+- Public DNS/TLS, production deployment, and production-path verification
+  remain pending.
+- An encrypted, restricted off-host backup transport and homelab decryption
+  path passed with synthetic content. A real Hookbin PostgreSQL `pg_dump -Fc`
+  and isolated restore rehearsal remain required before public ingress.
 - The deployment must set `WEBHOOK_PUBLIC_BASE_URL` to the public HTTPS origin;
   it has not yet been exercised in production.
 
@@ -192,9 +206,10 @@ preflight access requires operator-assisted sudo and `hookbin.farandy.id` has
 no public DNS record.
 
 The repository has delivery artifacts in `deploy/`, and the immutable GHCR
-images for commit `c4a2419` were published and verified anonymously pullable.
-They have not been deployed. Backup destination, DNS, and the approved server
-change record remain required before first exposure.
+images for commit `77cfae8c48e206273b09450bb91be1e537b3ad07` were published and
+verified anonymously pullable. They have not been deployed. Backup destination
+and encrypted transport are prepared, but the real dump/restore rehearsal,
+DNS, and approved server change record remain required before first exposure.
 
 Do not add accounts, SSE, distributed infrastructure, or broad portfolio polish
 as part of this milestone.
