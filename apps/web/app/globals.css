@@ -11,6 +11,10 @@ h2 { margin: .15rem 0 .65rem; }
 h3 { font-size: .9rem; margin: 1.75rem 0 .55rem; text-transform: uppercase; letter-spacing: .08em; }
 .eyebrow { color: #75e6b3; font-size: .77rem; font-weight: 700; letter-spacing: .12em; margin: 0; text-transform: uppercase; }
 .intro { color: #b8c3de; font-size: 1.15rem; line-height: 1.6; margin: 0 0 1.5rem; }
+.how-it-works { background: #101a31; border-left: 3px solid #75e6b3; border-radius: .4rem; margin: 1.5rem 0; padding: 1rem 1.25rem; }
+.how-it-works ol { color: #c4cde2; line-height: 1.7; margin: .55rem 0 0; padding-left: 1.35rem; }
+.guide-link, .back-link { color: #75e6b3; display: inline-block; font-weight: 700; margin-top: .8rem; text-decoration: none; }
+.guide-link:hover, .back-link:hover { color: #a0f3ce; text-decoration: underline; }
 .endpoint-card, .inspector { background: #131b32; border: 1px solid #273558; border-radius: .8rem; margin-top: 2.5rem; padding: 1.5rem; }
 .url-row { align-items: center; display: flex; gap: .7rem; }
 code { background: #091126; border: 1px solid #2b3d64; border-radius: .4rem; display: block; flex: 1; overflow-wrap: anywhere; padding: .75rem; }
@@ -31,4 +35,14 @@ dl div { border-bottom: 1px solid #273558; display: grid; gap: .5rem; grid-templ
 dt { color: #75e6b3; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; overflow-wrap: anywhere; }
 dd { margin: 0; overflow-wrap: anywhere; }
 pre { background: #091126; border: 1px solid #273558; border-radius: .4rem; margin: 0; overflow: auto; padding: 1rem; white-space: pre-wrap; word-break: break-word; }
+.usage-example { border-top: 1px solid #273558; margin-top: 1.25rem; padding-top: 1.25rem; }
+.usage-example p { margin-bottom: .7rem; }
+.docs-page { max-width: 52rem; }
+.docs-page h1 { max-width: 42rem; }
+.docs-section { border-top: 1px solid #273558; margin-top: 2rem; padding-top: 1.5rem; }
+.docs-section h2 { font-size: 1.35rem; }
+.docs-section p { color: #c4cde2; line-height: 1.65; }
+.docs-section pre { margin-top: 1rem; }
+.docs-section li { color: #c4cde2; line-height: 1.7; margin: .35rem 0; }
+.back-link { margin: 0 0 2.5rem; }
 @media (max-width: 700px) { main { padding-top: 3rem; } .url-row, .request-layout { display: grid; grid-template-columns: 1fr; } dl div { grid-template-columns: 1fr; gap: .2rem; } }

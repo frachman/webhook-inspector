@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 
 type Endpoint = {
   endpointId: string;
@@ -152,6 +153,15 @@ export default function Home() {
         <p className="eyebrow">Disposable endpoint</p>
         <h1>Webhook Inspector</h1>
         <p className="intro">See exactly what an application sends. Captured bodies are shown as text, never rendered as HTML.</p>
+        <div className="how-it-works">
+          <p className="eyebrow">How it works</p>
+          <ol>
+            <li>Create a temporary endpoint.</li>
+            <li>Send your request to its URL.</li>
+            <li>Refresh to inspect what arrived.</li>
+          </ol>
+          <Link className="guide-link" href="/docs">Read the usage guide →</Link>
+        </div>
         {!endpoint ? (
           <button type="button" onClick={() => void createEndpoint()} disabled={isCreating}>
             {isCreating ? "Creating endpoint…" : "Create endpoint"}
@@ -178,6 +188,11 @@ export default function Home() {
               ? `This private viewer expires ${formatDate(endpoint.expiresAt)}. Its credentials stay only in this browser.`
               : "This browser blocks local storage, so this endpoint will be forgotten when the page reloads."}
           </p>
+          <div className="usage-example">
+            <p className="eyebrow">Try it now</p>
+            <p className="muted">Send a request from any terminal or application. The URL accepts GET, POST, PUT, PATCH, and DELETE.</p>
+            <pre>{`curl -X POST '${endpoint.webhookUrl}' \\\n  -H 'Content-Type: application/json' \\\n  -H 'X-Demo: webhook-inspector' \\\n  -d '{"hello":"world"}'`}</pre>
+          </div>
         </section>
       )}
 
