@@ -5,6 +5,10 @@ button { border: 0; border-radius: .5rem; background: #75e6b3; color: #062116; c
 button:hover:not(:disabled) { background: #a0f3ce; }
 button:disabled { cursor: wait; opacity: .65; }
 main { margin: 0 auto; max-width: 72rem; padding: 5rem 1.25rem; }
+.language-toggle { display: flex; gap: .25rem; justify-content: flex-end; margin-bottom: 1rem; }
+.language-toggle button { border-radius: .35rem; font-size: .75rem; padding: .4rem .55rem; }
+.language-toggle .language { background: transparent; border: 1px solid #273558; color: #a7b5d2; }
+.language-toggle .language-active { background: #75e6b3; color: #062116; }
 .hero { max-width: 45rem; }
 h1 { font-size: clamp(2.5rem, 7vw, 5rem); letter-spacing: -.06em; line-height: .95; margin: .25rem 0 1rem; }
 h2 { margin: .15rem 0 .65rem; }

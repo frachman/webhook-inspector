@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { Language, LanguageToggle } from "./components/LanguageToggle";
 
 type Endpoint = {
   endpointId: string;
@@ -54,6 +55,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [storageAvailable, setStorageAvailable] = useState(true);
+  const [language, setLanguage] = useState<Language>("en");
 
   useEffect(() => {
     try {
@@ -63,6 +65,16 @@ export default function Home() {
       setStorageAvailable(false);
     }
   }, []);
+
+  useEffect(() => {
+    const saved = window.localStorage.getItem("webhook-inspector.language");
+    if (saved === "en" || saved === "id") setLanguage(saved);
+  }, []);
+
+  function changeLanguage(next: Language) {
+    setLanguage(next);
+    window.localStorage.setItem("webhook-inspector.language", next);
+  }
 
   const loadRequests = useCallback(async (current: Endpoint) => {
     setIsLoading(true);
@@ -149,22 +161,23 @@ export default function Home() {
 
   return (
     <main>
+      <LanguageToggle language={language} onChange={changeLanguage} />
       <section className="hero">
-        <p className="eyebrow">Disposable endpoint</p>
+        <p className="eyebrow">{language === "id" ? "Endpoint sementara" : "Disposable endpoint"}</p>
         <h1>Webhook Inspector</h1>
-        <p className="intro">See exactly what an application sends. Captured bodies are shown as text, never rendered as HTML.</p>
+        <p className="intro">{language === "id" ? "Lihat persis data yang dikirim aplikasi. Body yang ditangkap ditampilkan sebagai teks, bukan dirender sebagai HTML." : "See exactly what an application sends. Captured bodies are shown as text, never rendered as HTML."}</p>
         <div className="how-it-works">
-          <p className="eyebrow">How it works</p>
+          <p className="eyebrow">{language === "id" ? "Cara kerja" : "How it works"}</p>
           <ol>
-            <li>Create a temporary endpoint.</li>
-            <li>Send your request to its URL.</li>
-            <li>Refresh to inspect what arrived.</li>
+            <li>{language === "id" ? "Buat endpoint sementara." : "Create a temporary endpoint."}</li>
+            <li>{language === "id" ? "Kirim request ke URL tersebut." : "Send your request to its URL."}</li>
+            <li>{language === "id" ? "Refresh untuk melihat data yang masuk." : "Refresh to inspect what arrived."}</li>
           </ol>
-          <Link className="guide-link" href="/docs">Read the usage guide →</Link>
+          <Link className="guide-link" href="/docs">{language === "id" ? "Baca panduan penggunaan →" : "Read the usage guide →"}</Link>
         </div>
         {!endpoint ? (
           <button type="button" onClick={() => void createEndpoint()} disabled={isCreating}>
-            {isCreating ? "Creating endpoint…" : "Create endpoint"}
+            {isCreating ? (language === "id" ? "Membuat endpoint…" : "Creating endpoint…") : (language === "id" ? "Buat endpoint" : "Create endpoint")}
           </button>
         ) : (
           <button type="button" className="secondary" onClick={forgetEndpoint}>Forget this endpoint</button>
