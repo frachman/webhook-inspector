@@ -1,0 +1,8 @@
+# Default owner for all repository changes.
+* @frachman
+
+# Sensitive delivery and deployment paths.
+.github/ @frachman
+deploy/ @frachman
+apps/api/ @frachman
+apps/web/ @frachman
