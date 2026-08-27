@@ -24,6 +24,15 @@ export default function DocsPage() {
 
   return (
     <main className="docs-page">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        name: "Webhook Inspector",
+        url: "https://hookbin.farandy.id/docs",
+        applicationCategory: "DeveloperApplication",
+        operatingSystem: "Any",
+        description: "Temporary webhook URL for inspecting requests from integrations.",
+      }) }} />
       <LanguageToggle language={language} onChange={changeLanguage} />
       <Link className="back-link" href="/">← Back to inspector</Link>
       <p className="eyebrow">{language === "id" ? "Panduan penggunaan" : "Usage guide"}</p>
@@ -50,6 +59,39 @@ export default function DocsPage() {
       <section className="docs-section">
         <h2>3. {language === "id" ? "Periksa capture" : "Inspect the capture"}</h2>
         <p>{language === "id" ? <>Kembali ke inspector dan klik <strong>Refresh</strong>. Pilih request untuk melihat method, path, query string, header, content type, dan body.</> : <>Return to the inspector and click <strong>Refresh</strong>. Select a request to view its method, path, query string, headers, content type, and body.</>}</p>
+      </section>
+
+      <section className="docs-section">
+        <h2>{language === "id" ? "Contoh penggunaan nyata" : "Real-world examples"}</h2>
+        <article className="use-case">
+          <h3>Stripe webhook</h3>
+          <p>{language === "id" ? "Saat mengintegrasikan Stripe, gunakan URL Hookbin sebagai tujuan webhook sementara. Jalankan test event seperti checkout.session.completed untuk melihat payload JSON, header signature, dan event type sebelum membuat handler backend." : "When integrating Stripe, use your Hookbin URL as a temporary webhook destination. Trigger a test event such as checkout.session.completed to inspect the JSON payload, signature headers, and event type before writing your backend handler."}</p>
+          <p className="muted">{language === "id" ? "Setelah handler siap, ganti URL Hookbin dengan endpoint production Anda. Hookbin bukan payment processor dan bukan endpoint pembayaran production." : "Once your handler is ready, replace the Hookbin URL with your production endpoint. Hookbin is not a payment processor or a production payment endpoint."}</p>
+        </article>
+        <article className="use-case">
+          <h3>GitHub webhook</h3>
+          <p>{language === "id" ? "Untuk GitHub, kirim test event push ke URL Hookbin. Periksa header X-GitHub-Event dan payload commit untuk memastikan aplikasi Anda memahami format event yang benar." : "For GitHub, send a test push event to your Hookbin URL. Inspect the X-GitHub-Event header and commit payload to confirm your application understands the event format."}</p>
+        </article>
+        <article className="use-case">
+          <h3>Payment gateway</h3>
+          <p>{language === "id" ? "Gunakan Hookbin untuk melihat notification callback dari payment gateway seperti Midtrans atau provider lain: status pembayaran, order ID, signature, dan content type dapat diperiksa sebelum endpoint production dibuat." : "Use Hookbin to inspect notification callbacks from a payment gateway such as Midtrans or another provider: payment status, order ID, signature, and content type can be checked before building the production endpoint."}</p>
+        </article>
+      </section>
+
+      <section className="docs-section" id="faq">
+        <h2>FAQ</h2>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: [
+            { "@type": "Question", name: "What is Webhook Inspector?", acceptedAnswer: { "@type": "Answer", text: "It creates a temporary URL that records incoming HTTP requests so you can inspect webhook integrations." } },
+            { "@type": "Question", name: "Can I use it with Stripe or GitHub?", acceptedAnswer: { "@type": "Answer", text: "Yes. Use the generated URL as a temporary webhook destination while testing event payloads and headers." } },
+            { "@type": "Question", name: "Is it a production webhook endpoint?", acceptedAnswer: { "@type": "Answer", text: "No. It is intended for debugging with test or non-sensitive data. Replace it with your own production endpoint when ready." } },
+          ],
+        }) }} />
+        <details><summary>What is Webhook Inspector?</summary><p>It creates a temporary URL that records incoming HTTP requests so you can inspect webhook integrations.</p></details>
+        <details><summary>Can I use it with Stripe or GitHub?</summary><p>Yes. Use the generated URL as a temporary webhook destination while testing event payloads and headers.</p></details>
+        <details><summary>Is it a production webhook endpoint?</summary><p>No. It is intended for debugging with test or non-sensitive data. Replace it with your own production endpoint when ready.</p></details>
       </section>
 
       <section className="docs-section notes">
