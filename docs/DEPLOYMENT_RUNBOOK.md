@@ -110,6 +110,15 @@ provisioning an SSH `known_hosts` file for the homelab destination. A timer
 installation is a separate remote change and must be verified with
 `systemctl list-timers` and a manual `systemctl start` of each oneshot service.
 
+## Health monitoring
+
+`deploy/hookbin-health-check.sh` checks that PostgreSQL, API, and web containers
+are running and healthy, then performs a bounded public HTTPS smoke check. Install
+`hookbin-health-check.env` as `/etc/hookbin/health-check.env` with mode 600,
+install the service and timer units, then enable the timer. Failures are recorded
+in the system journal and produce a non-zero oneshot exit status for host-level
+alerting.
+
 ## Phase 3 — Change Proposal Gate
 
 Before any command that creates DNS records, directories, volumes, containers,

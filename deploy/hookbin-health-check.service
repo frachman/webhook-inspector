@@ -1,0 +1,14 @@
+[Unit]
+Description=Check Hookbin container and public health
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/hookbin-health-check.sh
+User=root
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/run
+NoNewPrivileges=true

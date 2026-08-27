@@ -1,0 +1,12 @@
+[Unit]
+Description=Run Hookbin health check periodically
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=5min
+RandomizedDelaySec=60
+Persistent=true
+Unit=hookbin-health-check.service
+
+[Install]
+WantedBy=timers.target
