@@ -119,6 +119,9 @@ install the service and timer units, then enable the timer. Failures are recorde
 in the system journal and produce a non-zero oneshot exit status for host-level
 alerting.
 
+The public actuator surface is intentionally limited to the health endpoint;
+health details and the `/info` endpoint are not exposed publicly.
+
 ## Phase 3 — Change Proposal Gate
 
 Before any command that creates DNS records, directories, volumes, containers,

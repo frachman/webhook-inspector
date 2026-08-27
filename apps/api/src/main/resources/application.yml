@@ -16,7 +16,10 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health
+  endpoint:
+    health:
+      show-details: never
 
 webhook:
   default-ttl-hours: ${WEBHOOK_DEFAULT_TTL_HOURS:24}
