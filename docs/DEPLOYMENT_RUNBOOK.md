@@ -122,6 +122,16 @@ alerting.
 The public actuator surface is intentionally limited to the health endpoint;
 health details and the `/info` endpoint are not exposed publicly.
 
+## Automated production deployment
+
+`deploy-production.yml` runs only after the `Publish images` workflow succeeds
+for a `main` commit. Configure the repository's `production` Environment with
+`PROD_SSH_HOST`, `PROD_SSH_USER`, `PROD_SSH_PRIVATE_KEY`, and
+`PROD_SSH_KNOWN_HOSTS` secrets. Keep required reviewers enabled initially.
+The job backs up `/srv/hookbin/.env`, deploys the exact workflow commit SHA,
+waits for healthy containers and a public HTTPS check, and restores the previous
+environment if verification fails.
+
 ## Phase 3 — Change Proposal Gate
 
 Before any command that creates DNS records, directories, volumes, containers,

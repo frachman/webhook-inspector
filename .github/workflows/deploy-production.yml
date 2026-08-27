@@ -1,0 +1,70 @@
+name: Deploy production
+
+on:
+  workflow_run:
+    workflows: [Publish images]
+    types: [completed]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy verified images to production
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main'
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 15
+    env:
+      RELEASE_SHA: ${{ github.event.workflow_run.head_sha }}
+      PROD_SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
+      PROD_SSH_USER: ${{ secrets.PROD_SSH_USER }}
+      PROD_SSH_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+      PROD_SSH_KNOWN_HOSTS: ${{ secrets.PROD_SSH_KNOWN_HOSTS }}
+    steps:
+      - name: Configure SSH
+        shell: bash
+        run: |
+          set -euo pipefail
+          install -d -m 700 "$HOME/.ssh"
+          printf '%s\n' "$PROD_SSH_PRIVATE_KEY" > "$HOME/.ssh/id_ed25519"
+          printf '%s\n' "$PROD_SSH_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/id_ed25519" "$HOME/.ssh/known_hosts"
+
+      - name: Deploy and verify
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -i "$HOME/.ssh/id_ed25519" "$PROD_SSH_USER@$PROD_SSH_HOST" "RELEASE_SHA=$RELEASE_SHA bash -s" <<'REMOTE'
+          set -eu
+          cd /srv/hookbin
+          backup="/srv/hookbin/.env.pre-$RELEASE_SHA"
+          cp .env "$backup"
+          rollback() {
+            cp "$backup" .env
+            docker compose --env-file .env -f docker-compose.yml up -d api web >/dev/null 2>&1 || true
+          }
+          trap rollback ERR
+          sed -i "s#^HOOKBIN_API_IMAGE=.*#HOOKBIN_API_IMAGE=ghcr.io/frachman/webhook-inspector-api:sha-$RELEASE_SHA#; s#^HOOKBIN_WEB_IMAGE=.*#HOOKBIN_WEB_IMAGE=ghcr.io/frachman/webhook-inspector-web:sha-$RELEASE_SHA#" .env
+          docker compose --env-file .env -f docker-compose.yml pull api web
+          docker compose --env-file .env -f docker-compose.yml up -d api web
+          for attempt in $(seq 1 30); do
+            api_health=$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}unknown{{end}}' hookbin-api-1)
+            web_health=$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}unknown{{end}}' hookbin-web-1)
+            if [ "$api_health" = healthy ] && [ "$web_health" = healthy ]; then
+              curl --fail --silent --show-error --max-time 10 https://hookbin.farandy.id/ >/dev/null
+              trap - ERR
+              echo "production deployment verified: $RELEASE_SHA"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "production deployment did not become healthy" >&2
+          exit 1
+          REMOTE
