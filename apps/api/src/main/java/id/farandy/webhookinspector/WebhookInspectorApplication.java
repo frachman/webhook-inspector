@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-@EnableConfigurationProperties(WebhookProperties.class)
+@EnableConfigurationProperties({WebhookProperties.class, RateLimitProperties.class})
 @EnableScheduling
 public class WebhookInspectorApplication {
 

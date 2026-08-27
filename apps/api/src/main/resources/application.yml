@@ -24,3 +24,8 @@ webhook:
   max-requests-per-endpoint: ${WEBHOOK_MAX_REQUESTS_PER_ENDPOINT:100}
   cleanup-interval: ${WEBHOOK_CLEANUP_INTERVAL:PT1H}
   public-base-url: ${WEBHOOK_PUBLIC_BASE_URL:}
+
+rate-limit:
+  api-per-minute: ${WEBHOOK_API_RATE_LIMIT_PER_MINUTE:60}
+  webhook-per-minute: ${WEBHOOK_CAPTURE_RATE_LIMIT_PER_MINUTE:120}
+  max-tracked-keys: ${WEBHOOK_RATE_LIMIT_MAX_TRACKED_KEYS:10000}
