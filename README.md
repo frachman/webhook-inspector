@@ -2,10 +2,33 @@
 
 A disposable endpoint for seeing exactly what an application sends.
 
+Create a temporary webhook URL, send requests from any service or terminal,
+then inspect the method, query string, headers, and body in a private viewer.
+The hosted usage guide is available at [hookbin.farandy.id/docs](https://hookbin.farandy.id/docs).
+
 The repository is a small monorepo:
 
 - `apps/api` — Spring Boot API and webhook receiver
 - `apps/web` — minimal Next.js viewer
+
+## Quick usage
+
+1. Start the web viewer and click **Create endpoint**.
+2. Copy the generated URL into a webhook provider, application, or test command.
+3. Refresh the viewer to inspect captured requests.
+
+Example request:
+
+```bash
+curl -X POST 'YOUR_WEBHOOK_URL' \
+  -H 'Content-Type: application/json' \
+  -H 'X-Event: order.created' \
+  -d '{"orderId":"123","status":"paid"}'
+```
+
+The endpoint accepts `GET`, `POST`, `PUT`, `PATCH`, and `DELETE`. Endpoints and
+their private viewers expire automatically. Use test or non-sensitive data;
+this project is intended for debugging integrations.
 
 ## Run the API
 
@@ -85,6 +108,17 @@ curl -sS http://localhost:8080/api/endpoints/ENDPOINT_ID/requests \
 ```
 
 The viewer token is never stored directly; only its SHA-256 digest is persisted.
+
+## Production operations
+
+The production deployment uses immutable GHCR image tags, private PostgreSQL and
+API containers, scheduled encrypted PostgreSQL backups, backup verification on
+an off-host homelab, and a five-minute container/public health check. See
+[`docs/DEPLOYMENT_RUNBOOK.md`](docs/DEPLOYMENT_RUNBOOK.md) for the operator procedure.
+
+## License
+
+This project is licensed under the MIT License. See [`LICENSE`](LICENSE).
 
 ## Continue in a New CLI Session
 
