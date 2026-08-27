@@ -122,6 +122,11 @@ off-host storage, and a five-minute container/public health check. See
 
 This project is licensed under the MIT License. See [`LICENSE`](LICENSE).
 
+## Contributing
+
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for local setup, verification,
+commit, and Pull Request guidelines.
+
 ## Continue in a New CLI Session
 
 Coding agents should read `AGENTS.md` automatically. For a quick manual handoff:
