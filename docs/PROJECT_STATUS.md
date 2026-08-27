@@ -18,15 +18,9 @@ vertical slice:
 create endpoint -> receive webhook -> persist request -> retrieve request
 ```
 
-Repository baseline:
-
-- branch: `main`
-- completed implementation commit: `3660906`
-- first GitHub integration commit: `558c812`
-- remote: `git@github.com:frachman/webhook-inspector.git`
-
-Always use Git itself for the current commit and branch; the hashes above are
-historical milestone anchors, not a substitute for live state.
+The public repository is maintained on its `main` branch. Use Git itself for
+the current commit and branch; this document is a high-level status summary,
+not an operational deployment record.
 
 ## Implemented
 
@@ -89,25 +83,11 @@ The viewer token is returned only when an endpoint is created.
 
 ## Verified Evidence
 
-Latest CI and delivery verification on 2026-08-27:
-
-- commit `77cfae8c48e206273b09450bb91be1e537b3ad07` passed GitHub Actions CI;
-- immutable API and web images for that commit were published to public GHCR
-  packages and verified anonymously pullable;
-- the production-origin configuration is covered by an API test using a fixed
-  public HTTPS origin.
-- commit `d521fed7d64df99ae857fd5a94357fdba641a95d` passed CI and its web image
-  was published after adding the public `/w/*` proxy rewrite.
-- the first private production stack started with healthy PostgreSQL, API, and
-  web services, with no Hookbin host ports published;
-- the real database recovery rehearsal passed: an encrypted `pg_dump -Fc` was
-  transferred off-host, checksum-verified, and restored to isolated PostgreSQL;
-- `https://hookbin.farandy.id/` returned HTTP 200 through Cloudflare and Caddy
-  after Caddy obtained its certificate. Existing primary sites returned HTTP
-  200 in read-only regression checks.
-- production end-to-end smoke passed: endpoint creation, generated public
-  webhook URL, POST capture with body and custom header, authenticated list,
-  and request-detail verification.
+The application has passed CI, container image build checks, local integration
+tests, and a production-path smoke test covering endpoint creation, webhook
+capture, authenticated request listing, and request detail. Operational
+deployment, host topology, backup locations, and recovery transcripts are kept
+outside this public status document.
 
 Most recent full verification on 2026-08-24:
 
@@ -186,47 +166,21 @@ Local web/API smoke verification on 2026-08-24:
 ## Known Limitations
 
 - No SSE/live updates.
-- No application-level rate limiting.
 - No staging deployment.
 - A manual browser acceptance pass is still useful, but the production
   webhook-capture path is verified.
 - The encrypted off-host backup transport and real PostgreSQL restore rehearsal
-  passed before public ingress. Backup automation scripts, retention handling,
-  and freshness checks are now implemented in `deploy/`, but have not yet been
-  installed as production timers.
-- The deployment must set `WEBHOOK_PUBLIC_BASE_URL` to the public HTTPS origin;
-  it has not yet been exercised in production.
+  passed before public ingress. Backup automation, retention handling, and
+  freshness checks are represented by the deployable timer units in `deploy/`.
 
 These limitations are acceptable for the completed backend vertical slice but
 must be addressed before public exposure as appropriate.
 
 ## Recommended Next Milestone
 
-Next milestone: operational hardening after first production verification.
-
-Smallest useful scope:
-
-1. Select and perform a read-only suitability audit of the hosting target for
-   `hookbin.farandy.id`; do not infer a host from prior projects.
-2. Design deployment, PostgreSQL backup/restore, TLS, forwarding-header, and
-   exposure controls for that target before making any infrastructure change.
-3. Make the first deployment only after the plan, backup readiness, and exact
-   target identity are accepted.
-
-Current deployment-planning evidence is in `docs/DEPLOYMENT_PLAN.md`. The
-candidate Mikrolyt VPS has a compatible Caddy/Docker topology, but privileged
-preflight access requires operator-assisted sudo and `hookbin.farandy.id` has
-no public DNS record.
-
-The repository has delivery artifacts in `deploy/`. The API image from
-`77cfae8c48e206273b09450bb91be1e537b3ad07` and the corrected web image from
-`d521fed7d64df99ae857fd5a94357fdba641a95d` are deployed. The private stack,
-encrypted database restore rehearsal, Caddy ingress, certificate issuance,
-public home-page smoke check, and production endpoint/capture/list/detail flow
-are verified.
-
-Do not add accounts, SSE, distributed infrastructure, or broad portfolio polish
-as part of this milestone.
+Continue operational hardening with alerting, secret scanning, and documented
+recovery verification. Keep infrastructure-specific commands and sensitive
+deployment evidence in access-controlled operator documentation.
 
 ## Updating This File
 

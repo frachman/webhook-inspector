@@ -1,0 +1,10 @@
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Intentional non-secret examples and documentation placeholders"
+regexes = [
+  '''replace(-|_)with(-|_)a(-|_)secret''',
+  '''REPLACE_WITH_[A-Z_]+''',
+  '''<viewer-token>'''
+]
