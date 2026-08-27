@@ -109,12 +109,14 @@ curl -sS http://localhost:8080/api/endpoints/ENDPOINT_ID/requests \
 
 The viewer token is never stored directly; only its SHA-256 digest is persisted.
 
+See [`docs/ROADMAP.md`](docs/ROADMAP.md) for the public, high-level product roadmap.
+
 ## Production operations
 
 The production deployment uses immutable GHCR image tags, private PostgreSQL and
 API containers, scheduled encrypted PostgreSQL backups, backup verification on
-an off-host homelab, and a five-minute container/public health check. See
-[`docs/DEPLOYMENT_RUNBOOK.md`](docs/DEPLOYMENT_RUNBOOK.md) for the operator procedure.
+off-host storage, and a five-minute container/public health check. See
+[`docs/DEPLOYMENT_PLAN.md`](docs/DEPLOYMENT_PLAN.md) for the public release principles.
 
 ## License
 
