@@ -9,7 +9,8 @@ future changes still require their own approval.
 - Intended hostname: `hookbin.farandy.id`.
 - Release commit: `77cfae8c48e206273b09450bb91be1e537b3ad07`.
 - API image: `ghcr.io/frachman/webhook-inspector-api:sha-77cfae8c48e206273b09450bb91be1e537b3ad07`.
-- Web image: `ghcr.io/frachman/webhook-inspector-web:sha-77cfae8c48e206273b09450bb91be1e537b3ad07`.
+- Initial web image: `ghcr.io/frachman/webhook-inspector-web:sha-77cfae8c48e206273b09450bb91be1e537b3ad07`.
+- Current web image after capture-proxy fix: `ghcr.io/frachman/webhook-inspector-web:sha-d521fed7d64df99ae857fd5a94357fdba641a95d`.
 - Deployment source: `deploy/docker-compose.production.yml` copied to
   `/srv/hookbin/docker-compose.yml` with a server-only `/srv/hookbin/.env`.
 
@@ -57,6 +58,13 @@ Hookbin database content:
 
 This passed before the Caddy site block was added. The encrypted backup artifact
 and its checksum are retained in root-only verified off-host storage.
+
+## Post-Release End-to-End Verification
+
+On 2026-08-27, the deployed web image was verified through the public path by
+creating a disposable endpoint, sending a synthetic POST body and header to its
+generated `/w/...` URL, and checking the authenticated list and detail results.
+The generated URL used the configured public HTTPS origin.
 
 ## Rollback
 

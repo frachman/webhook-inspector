@@ -89,13 +89,15 @@ The viewer token is returned only when an endpoint is created.
 
 ## Verified Evidence
 
-Latest CI and delivery verification on 2026-08-26:
+Latest CI and delivery verification on 2026-08-27:
 
 - commit `77cfae8c48e206273b09450bb91be1e537b3ad07` passed GitHub Actions CI;
 - immutable API and web images for that commit were published to public GHCR
   packages and verified anonymously pullable;
 - the production-origin configuration is covered by an API test using a fixed
   public HTTPS origin.
+- commit `d521fed7d64df99ae857fd5a94357fdba641a95d` passed CI and its web image
+  was published after adding the public `/w/*` proxy rewrite.
 - the first private production stack started with healthy PostgreSQL, API, and
   web services, with no Hookbin host ports published;
 - the real database recovery rehearsal passed: an encrypted `pg_dump -Fc` was
@@ -103,6 +105,9 @@ Latest CI and delivery verification on 2026-08-26:
 - `https://hookbin.farandy.id/` returned HTTP 200 through Cloudflare and Caddy
   after Caddy obtained its certificate. Existing primary sites returned HTTP
   200 in read-only regression checks.
+- production end-to-end smoke passed: endpoint creation, generated public
+  webhook URL, POST capture with body and custom header, authenticated list,
+  and request-detail verification.
 
 Most recent full verification on 2026-08-24:
 
@@ -183,8 +188,8 @@ Local web/API smoke verification on 2026-08-24:
 - No SSE/live updates.
 - No application-level rate limiting.
 - No staging deployment.
-- Public browser acceptance and production webhook-capture verification remain
-  pending.
+- A manual browser acceptance pass is still useful, but the production
+  webhook-capture path is verified.
 - The encrypted off-host backup transport and real PostgreSQL restore rehearsal
   passed before public ingress. Backup automation, retention, and alerting are
   still manual and need a future operational decision.
@@ -196,7 +201,7 @@ must be addressed before public exposure as appropriate.
 
 ## Recommended Next Milestone
 
-Next milestone: deployment planning for public exposure.
+Next milestone: operational hardening after first production verification.
 
 Smallest useful scope:
 
@@ -212,13 +217,12 @@ candidate Mikrolyt VPS has a compatible Caddy/Docker topology, but privileged
 preflight access requires operator-assisted sudo and `hookbin.farandy.id` has
 no public DNS record.
 
-The repository has delivery artifacts in `deploy/`, and the immutable GHCR
-images for commit `77cfae8c48e206273b09450bb91be1e537b3ad07` were published and
-verified anonymously pullable, then deployed as the first release on
-2026-08-26. The private stack, encrypted database restore rehearsal, Caddy
-ingress, certificate issuance, and public home-page smoke check are verified.
-Browser acceptance of endpoint creation and webhook capture is the remaining
-release check.
+The repository has delivery artifacts in `deploy/`. The API image from
+`77cfae8c48e206273b09450bb91be1e537b3ad07` and the corrected web image from
+`d521fed7d64df99ae857fd5a94357fdba641a95d` are deployed. The private stack,
+encrypted database restore rehearsal, Caddy ingress, certificate issuance,
+public home-page smoke check, and production endpoint/capture/list/detail flow
+are verified.
 
 Do not add accounts, SSE, distributed infrastructure, or broad portfolio polish
 as part of this milestone.

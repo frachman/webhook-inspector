@@ -15,8 +15,8 @@ recovery rehearsal are verified; end-to-end browser acceptance remains pending.
 | PostgreSQL | KNOWN | Existing PostgreSQL is dedicated to RateCraft; Hookbin must use a separate container and new named volume |
 | Public hostname | VERIFIED | `https://hookbin.farandy.id/` returned HTTP 200 through Cloudflare and Caddy on 2026-08-26 |
 | Privileged deployment access | OPERATOR-ASSISTED | `deploy` has no passwordless sudo or Docker-group access; operator is available for interactive sudo |
-| Immutable delivery images | KNOWN | GitHub Actions published and anonymous pulls verified for API and web images at `sha-77cfae8c48e206273b09450bb91be1e537b3ad07` |
-| Encrypted off-host transport | PROVEN | Restricted SFTP transfer to a user-controlled homelab and decryption with a homelab-only recovery key passed using synthetic content |
+| Immutable delivery images | VERIFIED | API remains at `sha-77cfae8c48e206273b09450bb91be1e537b3ad07`; the web proxy fix is deployed at `sha-d521fed7d64df99ae857fd5a94357fdba641a95d` |
+| Encrypted off-host transport | PROVEN | Restricted SFTP transfer, homelab-only decryption, and isolated restore passed with a real PostgreSQL dump |
 | Database recovery rehearsal | VERIFIED | Real `pg_dump -Fc` was encrypted on the VPS, checksum-verified after restricted SFTP transfer, and restored into an isolated PostgreSQL instance on the homelab |
 
 ## Intended Topology
@@ -69,7 +69,9 @@ artifact is retained in root-only verified off-host storage.
 The Caddyfile was backed up, edited in place, validated, and reloaded. Caddy
 obtained a certificate for `hookbin.farandy.id`; public HTTPS returned HTTP 200.
 Read-only checks also returned HTTP 200 for `farandy.id`, `mikrolyt.com`, and
-`vindue.id` after the reload.
+`vindue.id` after the reload. A production end-to-end smoke test then created
+an endpoint, sent a POST with a body and custom header, and verified the
+authenticated list and detail responses.
 
 ## Required Preflight
 
