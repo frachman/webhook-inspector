@@ -10,10 +10,8 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-@Component
 public class RateLimitFilter extends OncePerRequestFilter {
 
     private static final long WINDOW_SECONDS = 60;
