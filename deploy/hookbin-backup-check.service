@@ -1,5 +1,6 @@
 [Unit]
 Description=Check freshness of encrypted Hookbin backup
+OnFailure=hookbin-alert@%n.service
 
 [Service]
 Type=oneshot

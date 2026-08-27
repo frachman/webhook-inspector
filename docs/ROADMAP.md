@@ -5,7 +5,7 @@ features.
 
 ## Near term
 
-- External alerts for health and backup failures
+- External alerts for health and backup failures (implementation in `deploy/`)
 - Scheduled restore drills
 - Request replay and export
 - Webhook signature verification

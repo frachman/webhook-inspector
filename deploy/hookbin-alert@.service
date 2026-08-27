@@ -1,0 +1,14 @@
+[Unit]
+Description=Send Hookbin operational failure alert for %i
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/hookbin-alert.sh %i
+User=root
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadOnlyPaths=/etc/hookbin
+NoNewPrivileges=true

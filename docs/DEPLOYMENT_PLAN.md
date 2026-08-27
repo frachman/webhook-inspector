@@ -10,14 +10,16 @@ intentionally kept out of the public repository.
 - Publish immutable container images from verified `main` commits.
 - Keep PostgreSQL and the API private behind the web reverse proxy.
 - Require encrypted, off-host database backups and a tested restore path.
-- Run health checks after deployment and keep a recoverable previous release.
+- Run health checks after deployment, alert on failures, and keep a recoverable
+  previous release.
 - Verify the public homepage, endpoint creation, webhook capture, and viewer flow.
 
 ## Current status
 
 The first public release is live. CI, immutable image publishing, encrypted
 PostgreSQL backup automation, restore verification, rate limiting, health
-monitoring, bilingual onboarding, and SEO metadata are in place.
+monitoring, failure alerting, bilingual onboarding, and SEO metadata are in
+place.
 
 ## Public safety boundary
 
