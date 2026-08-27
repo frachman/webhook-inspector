@@ -1,0 +1,12 @@
+[Unit]
+Description=Verify and archive Hookbin backup uploads
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/hookbin-backup-receiver.sh
+User=root
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/data/backups/hookbin/incoming /data/backups/hookbin/verified
+NoNewPrivileges=true

@@ -1,0 +1,14 @@
+[Unit]
+Description=Encrypted Hookbin PostgreSQL backup
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/hookbin-backup.sh
+User=root
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/hookbin-backup
+NoNewPrivileges=true

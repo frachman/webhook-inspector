@@ -1,0 +1,11 @@
+[Unit]
+Description=Verify and archive Hookbin backup uploads daily
+
+[Timer]
+OnCalendar=*-*-* 05:15:00
+RandomizedDelaySec=15m
+Persistent=true
+Unit=hookbin-backup-receiver.service
+
+[Install]
+WantedBy=timers.target

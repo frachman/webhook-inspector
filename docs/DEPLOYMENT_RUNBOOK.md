@@ -93,6 +93,23 @@ first-release rehearsal then passed with a real Hookbin `pg_dump -Fc`: encrypted
 transfer, checksum verification, decryption, and restore to an isolated
 PostgreSQL instance all succeeded. Retain this procedure for future releases.
 
+The repository now provides the bounded automation pieces for this procedure:
+
+- `deploy/hookbin-backup.sh` streams a custom-format dump into GPG, uploads
+  ciphertext and checksum through SFTP using a temporary-name-then-rename
+  protocol, retains local encrypted artifacts, and records a freshness marker;
+- `deploy/hookbin-backup-check.sh` verifies that a fresh local artifact exists
+  and its checksum matches;
+- `deploy/hookbin-backup-receiver.sh` verifies incoming checksums, moves valid
+  artifacts into root-only verified storage, and applies receiver retention;
+- the accompanying systemd service/timer files schedule the backup, freshness
+  check, and receiver archive without putting secrets in Git.
+
+Install these scripts only after reviewing the server-only config examples and
+provisioning an SSH `known_hosts` file for the homelab destination. A timer
+installation is a separate remote change and must be verified with
+`systemctl list-timers` and a manual `systemctl start` of each oneshot service.
+
 ## Phase 3 — Change Proposal Gate
 
 Before any command that creates DNS records, directories, volumes, containers,

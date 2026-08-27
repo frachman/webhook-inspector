@@ -191,8 +191,9 @@ Local web/API smoke verification on 2026-08-24:
 - A manual browser acceptance pass is still useful, but the production
   webhook-capture path is verified.
 - The encrypted off-host backup transport and real PostgreSQL restore rehearsal
-  passed before public ingress. Backup automation, retention, and alerting are
-  still manual and need a future operational decision.
+  passed before public ingress. Backup automation scripts, retention handling,
+  and freshness checks are now implemented in `deploy/`, but have not yet been
+  installed as production timers.
 - The deployment must set `WEBHOOK_PUBLIC_BASE_URL` to the public HTTPS origin;
   it has not yet been exercised in production.
 

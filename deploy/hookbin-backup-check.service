@@ -1,0 +1,12 @@
+[Unit]
+Description=Check freshness of encrypted Hookbin backup
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/hookbin-backup-check.sh
+User=root
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadOnlyPaths=/var/lib/hookbin-backup /etc/hookbin
+NoNewPrivileges=true
