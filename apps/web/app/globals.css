@@ -10,6 +10,8 @@ main { margin: 0 auto; max-width: 72rem; padding: 5rem 1.25rem; }
 .language-toggle .language { background: transparent; border: 1px solid #273558; color: #a7b5d2; }
 .language-toggle .language-active { background: #75e6b3; color: #062116; }
 .hero { max-width: 45rem; }
+.benefits { border-top: 1px solid #273558; margin-top: 3rem; max-width: 52rem; padding-top: 1.5rem; }
+.benefits h2 { font-size: clamp(1.5rem, 3vw, 2.2rem); }
 h1 { font-size: clamp(2.5rem, 7vw, 5rem); letter-spacing: -.06em; line-height: .95; margin: .25rem 0 1rem; }
 h2 { margin: .15rem 0 .65rem; }
 h3 { font-size: .9rem; margin: 1.75rem 0 .55rem; text-transform: uppercase; letter-spacing: .08em; }
@@ -28,6 +30,10 @@ code { background: #091126; border: 1px solid #2b3d64; border-radius: .4rem; dis
 .secondary { background: #273558; color: #e7edfc; }
 .secondary:hover:not(:disabled) { background: #364971; }
 .empty { color: #a7b5d2; margin: 2rem 0 .5rem; }
+.endpoint-stats { color: #75e6b3; font-size: .9rem; }
+.search-label { color: #a7b5d2; display: block; font-size: .85rem; margin-bottom: .35rem; }
+.request-search { background: #091126; border: 1px solid #2b3d64; border-radius: .4rem; color: #edf2ff; font: inherit; margin-bottom: .8rem; padding: .7rem; width: 100%; }
+.detail-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: .8rem; }
 .request-layout { display: grid; gap: 1.5rem; grid-template-columns: minmax(15rem, .8fr) minmax(0, 1.2fr); }
 .request-list { display: grid; gap: .45rem; list-style: none; margin: 0; padding: 0; }
 .request { background: #0c1429; color: #edf2ff; display: grid; font-weight: 400; gap: .3rem; text-align: left; width: 100%; }

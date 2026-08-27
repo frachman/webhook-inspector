@@ -103,6 +103,12 @@ export default function DocsPage() {
           <li>{language === "id" ? "URL yang dihasilkan dapat digunakan dengan provider webhook apa pun." : "Use the generated URL with any webhook provider; it does not need to be hosted on your domain."}</li>
         </ul>
       </section>
+
+      <section className="docs-section">
+        <h2>{language === "id" ? "Pengembangan berikutnya" : "What is next"}</h2>
+        <p>{language === "id" ? "Fitur lanjutan yang sedang dipertimbangkan: replay request, export capture, signature verification, dan akun untuk menyimpan beberapa endpoint." : "Potential next features include request replay, capture export, signature verification, and accounts for keeping multiple endpoints."}</p>
+        <p className="muted">{language === "id" ? "Login belum diperlukan untuk alur debugging cepat ini. Akun akan berguna ketika Anda membutuhkan endpoint persisten, riwayat lintas perangkat, atau kolaborasi tim." : "Login is not required for this quick debugging flow. Accounts become useful when you need persistent endpoints, cross-device history, or team collaboration."}</p>
+      </section>
     </main>
   );
 }

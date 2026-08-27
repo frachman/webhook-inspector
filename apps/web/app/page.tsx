@@ -56,6 +56,7 @@ export default function Home() {
   const [copied, setCopied] = useState(false);
   const [storageAvailable, setStorageAvailable] = useState(true);
   const [language, setLanguage] = useState<Language>("en");
+  const [requestSearch, setRequestSearch] = useState("");
 
   useEffect(() => {
     try {
@@ -157,7 +158,12 @@ export default function Home() {
     setRequests([]);
     setSelectedRequest(null);
     setError(null);
+    setRequestSearch("");
   }
+
+  const filteredRequests = requests.filter((request) =>
+    `${request.method} ${displayPath(request)} ${request.contentType ?? ""}`.toLowerCase().includes(requestSearch.toLowerCase()),
+  );
 
   return (
     <main>
@@ -184,6 +190,12 @@ export default function Home() {
         )}
       </section>
 
+      <section className="benefits" aria-labelledby="benefits-heading">
+        <p className="eyebrow">{language === "id" ? "Mengapa Hookbin?" : "Why use Hookbin?"}</p>
+        <h2 id="benefits-heading">{language === "id" ? "Pahami webhook sebelum menulis handler production." : "Understand a webhook before writing your production handler."}</h2>
+        <p className="muted">{language === "id" ? "Gunakan endpoint sementara untuk melihat payload nyata dari Stripe, GitHub, payment gateway, atau aplikasi Anda sendiri." : "Use a temporary endpoint to see the real payload from Stripe, GitHub, a payment gateway, or your own application."}</p>
+      </section>
+
       {error && <p className="error" role="alert">{error}</p>}
 
       {endpoint && (
@@ -198,9 +210,10 @@ export default function Home() {
           </div>
           <p className="muted">
             {storageAvailable
-              ? `This private viewer expires ${formatDate(endpoint.expiresAt)}. Its credentials stay only in this browser.`
-              : "This browser blocks local storage, so this endpoint will be forgotten when the page reloads."}
+              ? `${language === "id" ? "Viewer privat berakhir" : "This private viewer expires"} ${formatDate(endpoint.expiresAt)}. ${language === "id" ? "Kredensial hanya tersimpan di browser ini." : "Its credentials stay only in this browser."}`
+              : (language === "id" ? "Browser ini memblokir local storage, sehingga endpoint akan dilupakan saat reload." : "This browser blocks local storage, so this endpoint will be forgotten when the page reloads.")}
           </p>
+          <p className="endpoint-stats">{language === "id" ? "Capture" : "Captured"}: {requests.length} / 100 · {language === "id" ? "kedaluwarsa" : "expires"} {formatDate(endpoint.expiresAt)}</p>
           <div className="usage-example">
             <p className="eyebrow">Try it now</p>
             <p className="muted">Send a request from any terminal or application. The URL accepts GET, POST, PUT, PATCH, and DELETE.</p>
@@ -220,10 +233,13 @@ export default function Home() {
               {isLoading ? "Refreshing…" : "Refresh"}
             </button>
           </div>
-          {requests.length === 0 ? <p className="empty">No requests yet. Send one to the webhook URL, then refresh.</p> : (
+          {requests.length === 0 ? <p className="empty">{language === "id" ? "Belum ada request. Kirim request ke URL webhook, lalu refresh." : "No requests yet. Send one to the webhook URL, then refresh."}</p> : (
             <div className="request-layout">
-              <ol className="request-list">
-                {requests.map((request) => (
+              <div>
+                <label className="search-label" htmlFor="request-search">{language === "id" ? "Cari request" : "Search requests"}</label>
+                <input id="request-search" className="request-search" value={requestSearch} onChange={(event) => setRequestSearch(event.target.value)} placeholder={language === "id" ? "method, path, content type" : "method, path, content type"} />
+                <ol className="request-list">
+                {filteredRequests.map((request) => (
                   <li key={request.id}>
                     <button type="button" className={selectedRequest?.id === request.id ? "request active" : "request"} onClick={() => void selectRequest(request)}>
                       <span className="method">{request.method}</span>
@@ -232,8 +248,10 @@ export default function Home() {
                     </button>
                   </li>
                 ))}
-              </ol>
-              {selectedRequest && <RequestPanel request={selectedRequest} />}
+                </ol>
+                {filteredRequests.length === 0 && <p className="empty">{language === "id" ? "Tidak ada hasil." : "No matching requests."}</p>}
+              </div>
+              {selectedRequest && <RequestPanel request={selectedRequest} endpointUrl={endpoint.webhookUrl} />}
             </div>
           )}
         </section>
@@ -242,7 +260,15 @@ export default function Home() {
   );
 }
 
-function RequestPanel({ request }: { request: RequestDetail }) {
+function RequestPanel({ request, endpointUrl }: { request: RequestDetail; endpointUrl: string }) {
+  const [copied, setCopied] = useState<string | null>(null);
+  const body = request.bodyText ?? (request.bodyBase64 ? `[base64]\n${request.bodyBase64}` : "");
+  const curl = [`curl -X ${request.method} '${endpointUrl}'`, ...Object.entries(request.headers).filter(([name]) => !["host", "content-length"].includes(name)).map(([name, values]) => `  -H '${name}: ${values.join(", ")}'`), ...(body ? [`  --data-raw '${body.replaceAll("'", "'\\''")}'`] : [])].join(" \\\n");
+  async function copy(value: string, kind: string) {
+    await navigator.clipboard.writeText(value);
+    setCopied(kind);
+    window.setTimeout(() => setCopied(null), 1800);
+  }
   return (
     <article className="detail">
       <h2><span className="method">{request.method}</span> {displayPath(request)}</h2>
@@ -252,6 +278,10 @@ function RequestPanel({ request }: { request: RequestDetail }) {
         {Object.entries(request.headers).map(([name, values]) => <div key={name}><dt>{name}</dt><dd>{values.join(", ")}</dd></div>)}
       </dl>
       <h3>Body</h3>
+      <div className="detail-actions">
+        <button type="button" className="secondary" onClick={() => void copy(request.bodyText ?? request.bodyBase64, "body")}>{copied === "body" ? "Copied" : "Copy body"}</button>
+        <button type="button" className="secondary" onClick={() => void copy(curl, "curl")}>{copied === "curl" ? "Copied" : "Copy as cURL"}</button>
+      </div>
       {request.bodyText !== null ? <pre>{request.bodyText || "(empty body)"}</pre> : <pre>Binary body (Base64):{`\n`}{request.bodyBase64 || "(empty body)"}</pre>}
     </article>
   );
