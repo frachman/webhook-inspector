@@ -7,6 +7,25 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve(__dirname),
   },
+  async headers() {
+    return [
+      {
+        source: "/",
+        headers: [
+          {
+            key: "Link",
+            value:
+              '</.well-known/api-catalog>; rel="api-catalog", </openapi.json>; rel="service-desc", </docs>; rel="service-doc", </openapi.json>; rel="describedby"',
+          },
+          { key: "Vary", value: "Accept" },
+        ],
+      },
+      {
+        source: "/docs",
+        headers: [{ key: "Vary", value: "Accept" }],
+      },
+    ];
+  },
   async rewrites() {
     return [
       {
