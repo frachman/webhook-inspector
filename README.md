@@ -1,5 +1,8 @@
 # Webhook Inspector
 
+> Create disposable webhook endpoints and inspect requests, headers, queries,
+> and bodies.
+
 A disposable endpoint for seeing exactly what an application sends.
 
 Create a temporary webhook URL, send requests from any service or terminal,
