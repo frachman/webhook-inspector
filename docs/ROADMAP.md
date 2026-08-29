@@ -5,6 +5,10 @@ features.
 
 ## Near term
 
+- Privacy-preserving usage analytics: measure homepage visits, endpoint
+  creation, webhook receipt, and endpoint views with anonymous daily aggregates;
+  pair product events with privacy-friendly website traffic analytics (such as
+  Plausible or Umami) so adoption and real usage can be reported separately.
 - External alerts for health and backup failures (implementation in `deploy/`)
 - Scheduled restore drills
 - Request replay and export

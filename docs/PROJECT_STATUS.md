@@ -178,9 +178,12 @@ must be addressed before public exposure as appropriate.
 
 ## Recommended Next Milestone
 
-Continue operational hardening with alerting, secret scanning, and documented
-recovery verification. Keep infrastructure-specific commands and sensitive
-deployment evidence in access-controlled operator documentation.
+Add privacy-preserving usage analytics before alerting: measure anonymous daily
+aggregates for homepage visits, endpoint creation, webhook receipt, and endpoint
+views, and evaluate a privacy-friendly traffic tool such as Plausible or Umami.
+Do not collect webhook payloads, headers, viewer tokens, or full IP addresses as
+analytics data. Keep infrastructure-specific commands and sensitive deployment
+evidence in access-controlled operator documentation.
 
 ## Updating This File
 
