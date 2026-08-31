@@ -27,6 +27,25 @@ class RateLimitFilterTest {
         assertThat(run(filter, "/api/endpoints").getStatus()).isEqualTo(200);
     }
 
+    @Test
+    void ignoresSpoofedCloudflareClientIpHeader() throws Exception {
+        RateLimitFilter filter = new RateLimitFilter(new RateLimitProperties(1, 3, 10),
+                Clock.fixed(Instant.parse("2026-08-27T00:00:00Z"), ZoneOffset.UTC));
+
+        MockHttpServletRequest first = new MockHttpServletRequest("POST", "/api/endpoints");
+        first.setRemoteAddr("10.0.0.5");
+        first.addHeader("CF-Connecting-IP", "198.51.100.10");
+        filter.doFilter(first, new MockHttpServletResponse(), new MockFilterChain());
+
+        MockHttpServletRequest spoofed = new MockHttpServletRequest("POST", "/api/endpoints");
+        spoofed.setRemoteAddr("10.0.0.5");
+        spoofed.addHeader("CF-Connecting-IP", "198.51.100.11");
+        MockHttpServletResponse rejected = new MockHttpServletResponse();
+        filter.doFilter(spoofed, rejected, new MockFilterChain());
+
+        assertThat(rejected.getStatus()).isEqualTo(429);
+    }
+
     private MockHttpServletResponse run(RateLimitFilter filter, String path) throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest("POST", path);
         MockHttpServletResponse response = new MockHttpServletResponse();

@@ -59,6 +59,23 @@ jobs:
             web_health=$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}unknown{{end}}' hookbin-web-1)
             if [ "$api_health" = healthy ] && [ "$web_health" = healthy ]; then
               curl --fail --silent --show-error --max-time 10 https://hookbin.farandy.id/ >/dev/null
+              smoke=$(mktemp)
+              trap 'rm -f "$smoke"' EXIT
+              curl --fail --silent --show-error --max-time 10 \
+                -H 'Content-Type: application/json' \
+                -X POST https://hookbin.farandy.id/api/backend/endpoints \
+                -d '{}' >"$smoke"
+              webhook_url=$(jq -er '.webhookUrl' "$smoke")
+              endpoint_id=$(jq -er '.endpointId' "$smoke")
+              viewer_token=$(jq -er '.viewerToken' "$smoke")
+              curl --fail --silent --show-error --max-time 10 \
+                -H 'Content-Type: application/json' \
+                -X POST "$webhook_url" \
+                -d '{"smoke":"production"}' >/dev/null
+              curl --fail --silent --show-error --max-time 10 \
+                -H "Authorization: Bearer $viewer_token" \
+                "https://hookbin.farandy.id/api/backend/endpoints/$endpoint_id/requests" \
+                | jq -e 'length >= 1' >/dev/null
               trap - ERR
               echo "production deployment verified: $RELEASE_SHA"
               exit 0

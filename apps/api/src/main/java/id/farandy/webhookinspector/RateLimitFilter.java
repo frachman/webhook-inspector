@@ -80,10 +80,9 @@ public class RateLimitFilter extends OncePerRequestFilter {
     }
 
     private String clientKey(HttpServletRequest request) {
-        String cloudflare = request.getHeader("CF-Connecting-IP");
-        if (cloudflare != null && !cloudflare.isBlank()) {
-            return cloudflare.trim();
-        }
+        // Do not trust client-controlled forwarding headers. The public API is
+        // reached through Caddy, and the servlet remote address is the only
+        // value this filter can safely use without a trusted-proxy contract.
         return request.getRemoteAddr() == null ? "unknown" : request.getRemoteAddr();
     }
 
