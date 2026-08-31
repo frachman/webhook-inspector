@@ -22,6 +22,7 @@ The public repository is maintained on its `main` branch. Use Git itself for
 the current commit and branch; this document is a high-level status summary,
 not an operational deployment record.
 
+
 ## Implemented
 
 - Spring Boot 4.1.1 API targeting Java 17.
