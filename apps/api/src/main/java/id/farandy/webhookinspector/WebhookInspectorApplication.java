@@ -13,8 +13,8 @@ import org.springframework.context.annotation.Bean;
 public class WebhookInspectorApplication {
 
     @Bean
-    RateLimitFilter rateLimitFilter(RateLimitProperties properties) {
-        return new RateLimitFilter(properties);
+    RateLimitFilter rateLimitFilter(RateLimitProperties properties, id.farandy.webhookinspector.service.UsageMetricsService metrics) {
+        return new RateLimitFilter(properties, java.time.Clock.systemUTC(), metrics);
     }
 
     @Bean

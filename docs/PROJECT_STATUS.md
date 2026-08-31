@@ -63,6 +63,11 @@ not an operational deployment record.
   `main` commit.
 - Configurable public webhook origin through `WEBHOOK_PUBLIC_BASE_URL`, so the
   generated capture URL is independent of private proxy hops.
+- Privacy-preserving daily usage metrics buffered in memory and flushed to
+  PostgreSQL, covering landing views, endpoint creation, webhook receipt,
+  viewer interactions, and rate-limited requests. The operator report is
+  available through `deploy/hookbin-usage-report.sh`; no payloads, tokens, or
+  full IP addresses are recorded as analytics data.
 
 ## API Surface
 
@@ -186,12 +191,11 @@ must be addressed before public exposure as appropriate.
 
 ## Recommended Next Milestone
 
-Add privacy-preserving usage analytics before alerting: measure anonymous daily
-aggregates for homepage visits, endpoint creation, webhook receipt, and endpoint
-views, and evaluate a privacy-friendly traffic tool such as Plausible or Umami.
-Do not collect webhook payloads, headers, viewer tokens, or full IP addresses as
-analytics data. Keep infrastructure-specific commands and sensitive deployment
-evidence in access-controlled operator documentation.
+Deploy and verify the privacy-preserving usage metrics baseline, then continue
+with external alerting and recovery verification. Do not collect webhook
+payloads, headers, viewer tokens, or full IP addresses as analytics data. Keep
+infrastructure-specific commands and sensitive deployment evidence in
+access-controlled operator documentation.
 
 ## Updating This File
 

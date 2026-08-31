@@ -1,5 +1,6 @@
 package id.farandy.webhookinspector;
 
+import id.farandy.webhookinspector.service.UsageMetricsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,15 +18,21 @@ public class RateLimitFilter extends OncePerRequestFilter {
     private static final long WINDOW_SECONDS = 60;
     private final RateLimitProperties properties;
     private final Clock clock;
+    private final UsageMetricsService metrics;
     private final Map<String, Window> windows = new ConcurrentHashMap<>();
 
     public RateLimitFilter(RateLimitProperties properties) {
-        this(properties, Clock.systemUTC());
+        this(properties, Clock.systemUTC(), null);
     }
 
     RateLimitFilter(RateLimitProperties properties, Clock clock) {
+        this(properties, clock, null);
+    }
+
+    RateLimitFilter(RateLimitProperties properties, Clock clock, UsageMetricsService metrics) {
         this.properties = properties;
         this.clock = clock;
+        this.metrics = metrics;
     }
 
     @Override
@@ -50,6 +57,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
             int used = window.count.incrementAndGet();
             remaining = Math.max(0, limit - used);
             if (used > limit) {
+                if (metrics != null) metrics.increment("rate_limited_requests");
                 long retryAfter = WINDOW_SECONDS - (now.getEpochSecond() - window.startedAt.getEpochSecond());
                 response.setStatus(429);
                 response.setHeader("Retry-After", Long.toString(Math.max(1, retryAfter)));

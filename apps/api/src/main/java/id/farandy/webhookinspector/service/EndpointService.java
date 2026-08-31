@@ -34,16 +34,19 @@ public class EndpointService {
     private final EndpointRepository endpointRepository;
     private final CapturedRequestRepository requestRepository;
     private final WebhookProperties properties;
+    private final UsageMetricsService metrics;
     private final SecureRandom secureRandom = new SecureRandom();
     private final Clock clock = Clock.systemUTC();
 
     public EndpointService(
             EndpointRepository endpointRepository,
             CapturedRequestRepository requestRepository,
-            WebhookProperties properties) {
+            WebhookProperties properties,
+            UsageMetricsService metrics) {
         this.endpointRepository = endpointRepository;
         this.requestRepository = requestRepository;
         this.properties = properties;
+        this.metrics = metrics;
     }
 
     @Transactional
@@ -59,6 +62,7 @@ public class EndpointService {
                 now,
                 now.plus(Duration.ofHours(ttlHours)));
         endpointRepository.save(endpoint);
+        metrics.increment("endpoints_created");
 
         return new CreateEndpointResponse(
                 endpoint.getId(),
@@ -99,12 +103,15 @@ public class EndpointService {
                 body.length,
                 now,
                 endpoint.getExpiresAt());
-        return requestRepository.save(captured);
+        CapturedRequestEntity saved = requestRepository.save(captured);
+        metrics.increment("webhooks_received");
+        return saved;
     }
 
     @Transactional(readOnly = true)
     public List<RequestSummary> list(UUID endpointId, String viewerToken) {
         EndpointEntity endpoint = authorize(endpointId, viewerToken);
+        metrics.increment("endpoint_views");
         return requestRepository.findAllByEndpointIdAndExpiresAtAfterOrderByCreatedAtDesc(endpoint.getId(), clock.instant())
                 .stream()
                 .map(request -> new RequestSummary(
@@ -121,6 +128,7 @@ public class EndpointService {
     @Transactional(readOnly = true)
     public RequestDetail detail(UUID endpointId, UUID requestId, String viewerToken) {
         EndpointEntity endpoint = authorize(endpointId, viewerToken);
+        metrics.increment("request_detail_views");
         CapturedRequestEntity request = requestRepository
                 .findByIdAndEndpointIdAndExpiresAtAfter(requestId, endpoint.getId(), clock.instant())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Captured request not found"));

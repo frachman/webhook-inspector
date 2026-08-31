@@ -59,6 +59,15 @@ export default function Home() {
   const [requestSearch, setRequestSearch] = useState("");
 
   useEffect(() => {
+    void fetch("/api/backend/telemetry/page-view", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ source: "landing" }),
+      keepalive: true,
+    }).catch(() => undefined);
+  }, []);
+
+  useEffect(() => {
     try {
       const saved = window.localStorage.getItem(storageKey);
       if (saved) setEndpoint(JSON.parse(saved) as Endpoint);
