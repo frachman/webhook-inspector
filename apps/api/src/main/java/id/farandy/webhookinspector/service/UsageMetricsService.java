@@ -1,12 +1,12 @@
 package id.farandy.webhookinspector.service;
 
-import jakarta.persistence.EntityManager;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.LongAdder;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,12 +21,12 @@ public class UsageMetricsService {
             "request_detail_views", "request_detail_views",
             "rate_limited_requests", "rate_limited_requests");
 
-    private final EntityManager entityManager;
+    private final JdbcTemplate jdbcTemplate;
     private final Clock clock = Clock.systemUTC();
     private final ConcurrentHashMap<String, LongAdder> pending = new ConcurrentHashMap<>();
 
-    public UsageMetricsService(EntityManager entityManager) {
-        this.entityManager = entityManager;
+    public UsageMetricsService(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     public void increment(String event) {
@@ -51,12 +51,10 @@ public class UsageMetricsService {
         try {
             for (Map.Entry<String, Long> entry : snapshot.entrySet()) {
                 String column = COLUMNS.get(entry.getKey());
-                entityManager.createNativeQuery("INSERT INTO usage_daily (event_date, " + column
-                                + ") VALUES (:eventDate, :count) ON CONFLICT (event_date) DO UPDATE SET "
-                                + column + " = usage_daily." + column + " + :count")
-                        .setParameter("eventDate", date)
-                        .setParameter("count", entry.getValue())
-                        .executeUpdate();
+                jdbcTemplate.update("INSERT INTO usage_daily (event_date, " + column
+                                + ") VALUES (?, ?) ON CONFLICT (event_date) DO UPDATE SET "
+                                + column + " = usage_daily." + column + " + ?", date, entry.getValue(),
+                        entry.getValue());
             }
         } catch (RuntimeException exception) {
             snapshot.forEach((event, value) -> pending.computeIfAbsent(event, ignored -> new LongAdder()).add(value));
