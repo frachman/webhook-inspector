@@ -7,7 +7,7 @@ A disposable endpoint for seeing exactly what an application sends.
 
 Create a temporary webhook URL, send requests from any service or terminal,
 then inspect the method, query string, headers, and body in a private viewer.
-The hosted usage guide is available at [hookbin.farandy.id/docs](https://hookbin.farandy.id/docs).
+The hosted usage guide is available at [hookbin.mikrolyt.com/docs](https://hookbin.mikrolyt.com/docs).
 
 The repository is a small monorepo:
 

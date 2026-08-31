@@ -28,7 +28,7 @@ export default function DocsPage() {
         "@context": "https://schema.org",
         "@type": "WebApplication",
         name: "Webhook Inspector",
-        url: "https://hookbin.farandy.id/docs",
+        url: "https://hookbin.mikrolyt.com/docs",
         applicationCategory: "DeveloperApplication",
         operatingSystem: "Any",
         description: "Temporary webhook URL for inspecting requests from integrations.",
