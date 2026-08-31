@@ -169,9 +169,11 @@ Local web/API smoke verification on 2026-08-24:
 - No staging deployment.
 - The 2026-08-31 production audit found that the currently referenced GHCR API
   tag does not contain the expected application artifact: the public API routes
-  return 404 even though the source and local tests contain them. A corrected
-  image must be published and deployed, followed by the functional deployment
-  smoke test.
+  return 404 even though the source and local tests contain them. The root cause
+  was a Docker-network hostname collision: the web proxy resolved `api` to an
+  unrelated stack. The production template now uses the unique `hookbin-api`
+  alias; a corrected image must be published and deployed, followed by the
+  functional deployment smoke test.
 - A manual browser acceptance pass is still useful, but the production
   webhook-capture path is verified.
 - The encrypted off-host backup transport and real PostgreSQL restore rehearsal
