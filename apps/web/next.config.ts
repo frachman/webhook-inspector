@@ -39,6 +39,12 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      { source: "/docs", destination: "https://docs.mikrolyt.com/hookbin", permanent: true },
+      { source: "/docs/:path*", destination: "https://docs.mikrolyt.com/hookbin/:path*", permanent: true },
+    ];
+  },
   async rewrites() {
     return [
       {
