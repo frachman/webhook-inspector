@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: production-deploy
+  group: webhook-inspector-production
   cancel-in-progress: false
 
 jobs:
