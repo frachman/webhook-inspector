@@ -55,47 +55,5 @@ jobs:
           eval "$(ssh-agent -s)"
           export SSH_ASKPASS="$RUNNER_TEMP/ssh/askpass" SSH_ASKPASS_REQUIRE=force DISPLAY=:0
           ssh-add "$RUNNER_TEMP/ssh/deploy_key" < /dev/null
-          ssh -o BatchMode=yes -o IdentitiesOnly=yes -i "$RUNNER_TEMP/ssh/deploy_key" -o StrictHostKeyChecking=yes -o UserKnownHostsFile="$RUNNER_TEMP/ssh/known_hosts" "$PROD_SSH_USER@$PROD_SSH_HOST" "RELEASE_SHA=$RELEASE_SHA bash -s" <<'REMOTE'
-          set -eu
-          cd /srv/hookbin
-          backup="/srv/hookbin/.env.pre-$RELEASE_SHA"
-          cp .env "$backup"
-          rollback() {
-            cp "$backup" .env
-            docker compose --env-file .env -f docker-compose.yml up -d api web >/dev/null 2>&1 || true
-          }
-          trap rollback ERR
-          sed -i "s#^HOOKBIN_API_IMAGE=.*#HOOKBIN_API_IMAGE=ghcr.io/frachman/webhook-inspector-api:sha-$RELEASE_SHA#; s#^HOOKBIN_WEB_IMAGE=.*#HOOKBIN_WEB_IMAGE=ghcr.io/frachman/webhook-inspector-web:sha-$RELEASE_SHA#" .env
-          docker compose --env-file .env -f docker-compose.yml pull api web
-          docker compose --env-file .env -f docker-compose.yml up -d api web
-          for attempt in $(seq 1 30); do
-            api_health=$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}unknown{{end}}' hookbin-api-1)
-            web_health=$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}unknown{{end}}' hookbin-web-1)
-            if [ "$api_health" = healthy ] && [ "$web_health" = healthy ]; then
-              curl --fail --silent --show-error --max-time 10 https://hookbin.farandy.id/ >/dev/null
-              smoke=$(mktemp)
-              trap 'rm -f "$smoke"' EXIT
-              curl --fail --silent --show-error --max-time 10 \
-                -H 'Content-Type: application/json' \
-                -X POST https://hookbin.farandy.id/api/backend/endpoints \
-                -d '{}' >"$smoke"
-              webhook_url=$(jq -er '.webhookUrl' "$smoke")
-              endpoint_id=$(jq -er '.endpointId' "$smoke")
-              viewer_token=$(jq -er '.viewerToken' "$smoke")
-              curl --fail --silent --show-error --max-time 10 \
-                -H 'Content-Type: application/json' \
-                -X POST "$webhook_url" \
-                -d '{"smoke":"production"}' >/dev/null
-              curl --fail --silent --show-error --max-time 10 \
-                -H "Authorization: Bearer $viewer_token" \
-                "https://hookbin.farandy.id/api/backend/endpoints/$endpoint_id/requests" \
-                | jq -e 'length >= 1' >/dev/null
-              trap - ERR
-              echo "production deployment verified: $RELEASE_SHA"
-              exit 0
-            fi
-            sleep 5
-          done
-          echo "production deployment did not become healthy" >&2
-          exit 1
-          REMOTE
+          export IMAGE_TAG="sha-$RELEASE_SHA"
+          ssh -o BatchMode=yes -o IdentitiesOnly=yes -i "$RUNNER_TEMP/ssh/deploy_key" -o StrictHostKeyChecking=yes -o UserKnownHostsFile="$RUNNER_TEMP/ssh/known_hosts" "$PROD_SSH_USER@$PROD_SSH_HOST" sudo /usr/local/sbin/mikrolyt-hookbin-deploy "$IMAGE_TAG"
