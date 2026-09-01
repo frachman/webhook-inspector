@@ -22,11 +22,25 @@ for attempt in $(seq 1 30); do
     smoke=$(mktemp)
     trap 'rm -f "$smoke"' EXIT
     curl --fail --silent --show-error --max-time 10 -H 'Content-Type: application/json' -X POST https://hookbin.farandy.id/api/backend/endpoints -d '{}' >"$smoke"
-    webhook_url=$(jq -er '.webhookUrl' "$smoke")
-    endpoint_id=$(jq -er '.endpointId' "$smoke")
-    viewer_token=$(jq -er '.viewerToken' "$smoke")
+    readarray -t smoke_values < <(python3 - "$smoke" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], encoding="utf-8") as handle:
+    payload = json.load(handle)
+
+for key in ("webhookUrl", "endpointId", "viewerToken"):
+    value = payload.get(key)
+    if not isinstance(value, str) or not value:
+        raise SystemExit(f"missing smoke response field: {key}")
+    print(value)
+PY
+    )
+    webhook_url="${smoke_values[0]}"
+    endpoint_id="${smoke_values[1]}"
+    viewer_token="${smoke_values[2]}"
     curl --fail --silent --show-error --max-time 10 -H 'Content-Type: application/json' -X POST "$webhook_url" -d '{"smoke":"production"}' >/dev/null
-    curl --fail --silent --show-error --max-time 10 -H "Authorization: Bearer $viewer_token" "https://hookbin.farandy.id/api/backend/endpoints/$endpoint_id/requests" | jq -e 'length >= 1' >/dev/null
+    curl --fail --silent --show-error --max-time 10 -H "Authorization: Bearer $viewer_token" "https://hookbin.farandy.id/api/backend/endpoints/$endpoint_id/requests" | python3 -c 'import json, sys; raise SystemExit(0 if len(json.load(sys.stdin)) >= 1 else 1)'
     trap - ERR
     echo "production deployment verified: $image_tag"
     exit 0
