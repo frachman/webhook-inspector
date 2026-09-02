@@ -202,3 +202,11 @@ access-controlled operator documentation.
 Update this document only with repository-backed facts. Record tests that were
 actually run, distinguish untested behavior, and replace the recommended next
 milestone when it is completed.
+
+## Brand Token Alignment (2026-09-02, branch feature/brand-token-alignment)
+
+- The web UI (landing + usage guide) now uses the Mikrolyt brand token system: ink #111827 surface, slate #1F2937 cards, yellow #F5C518 primary accent, green-derived link tints, gray #647488 muted text, with derived tints via color-mix.
+- Space Grotesk (display) and Inter (body) are loaded via next/font.
+- The product name "Hookbin" is restored on the landing h1, page title, JSON-LD, and usage-guide copy; the header uses the mikrolyt.com brand pattern (yellow M badge + "mikrolyt." wordmark + "Hookbin · M01" product tag + route stripe), and the footer links to mikrolyt.com. The UI is light-themed (off-white/ink) to match mikrolyt.com and docs.mikrolyt.com.
+- Metadata: title "Hookbin by Mikrolyt — Webhook Inspector", og:site_name "Mikrolyt".
+- Verified: `next build` for apps/web succeeds locally. Not yet verified: browser visual pass and production deployment; the branch is not merged.

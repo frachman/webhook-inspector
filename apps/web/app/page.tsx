@@ -175,11 +175,18 @@ export default function Home() {
   );
 
   return (
-    <main>
-      <LanguageToggle language={language} onChange={changeLanguage} />
+    <>
+      <header className="site-header">
+        <div className="site-header-inner">
+          <a className="brand" href="https://mikrolyt.com"><span className="brand-mark">M</span><span className="wordmark">Hookbin <small>by Mikrolyt</small><span className="dot">.</span></span></a>
+          <LanguageToggle language={language} onChange={changeLanguage} />
+        </div>
+      </header>
+      <div className="route-stripe" />
+      <main>
       <section className="hero">
-        <p className="eyebrow">{language === "id" ? "Endpoint sementara" : "Disposable endpoint"}</p>
-        <h1>Webhook Inspector</h1>
+        <p className="eyebrow">{language === "id" ? "M01 · Endpoint webhook sementara" : "M01 · Disposable webhook endpoint"}</p>
+        <h1>Hookbin</h1>
         <p className="intro">{language === "id" ? "Lihat persis data yang dikirim aplikasi. Body yang ditangkap ditampilkan sebagai teks, bukan dirender sebagai HTML." : "See exactly what an application sends. Captured bodies are shown as text, never rendered as HTML."}</p>
         <div className="how-it-works">
           <p className="eyebrow">{language === "id" ? "Cara kerja" : "How it works"}</p>
@@ -265,7 +272,14 @@ export default function Home() {
           )}
         </section>
       )}
+
+      <footer className="site-footer">
+        {language === "id"
+          ? <>Hookbin adalah bagian dari <a href="https://mikrolyt.com">Mikrolyt</a> developer tools.</>
+          : <>Hookbin is part of the <a href="https://mikrolyt.com">Mikrolyt</a> developer tools.</>}
+      </footer>
     </main>
+    </>
   );
 }
 
