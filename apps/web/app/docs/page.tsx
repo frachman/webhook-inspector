@@ -27,17 +27,20 @@ export default function DocsPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
         "@context": "https://schema.org",
         "@type": "WebApplication",
-        name: "Webhook Inspector",
+        name: "Hookbin",
         url: "https://hookbin.mikrolyt.com/docs",
         applicationCategory: "DeveloperApplication",
         operatingSystem: "Any",
         description: "Temporary webhook URL for inspecting requests from integrations.",
       }) }} />
-      <LanguageToggle language={language} onChange={changeLanguage} />
+      <div className="topbar">
+        <a className="brand" href="https://mikrolyt.com"><span className="brand-mark">M</span><span>Hookbin <small>by Mikrolyt</small></span></a>
+        <LanguageToggle language={language} onChange={changeLanguage} />
+      </div>
       <Link className="back-link" href="/">← Back to inspector</Link>
       <p className="eyebrow">{language === "id" ? "Panduan penggunaan" : "Usage guide"}</p>
       <h1>{language === "id" ? "Uji webhook dalam hitungan menit" : "Test any webhook in minutes"}</h1>
-      <p className="intro">{language === "id" ? "Webhook Inspector memberikan URL sementara yang merekam request HTTP agar Anda dapat memeriksa persis data yang dikirim integrasi." : "Webhook Inspector gives you a temporary URL that records incoming HTTP requests so you can inspect exactly what your integration sends."}</p>
+      <p className="intro">{language === "id" ? "Hookbin memberikan URL sementara yang merekam request HTTP agar Anda dapat memeriksa persis data yang dikirim integrasi." : "Hookbin gives you a temporary URL that records incoming HTTP requests so you can inspect exactly what your integration sends."}</p>
 
       <section className="docs-section">
         <h2>1. {language === "id" ? "Buat endpoint" : "Create an endpoint"}</h2>
@@ -109,6 +112,11 @@ export default function DocsPage() {
         <p>{language === "id" ? "Fitur lanjutan yang sedang dipertimbangkan: replay request, export capture, signature verification, dan akun untuk menyimpan beberapa endpoint." : "Potential next features include request replay, capture export, signature verification, and accounts for keeping multiple endpoints."}</p>
         <p className="muted">{language === "id" ? "Login belum diperlukan untuk alur debugging cepat ini. Akun akan berguna ketika Anda membutuhkan endpoint persisten, riwayat lintas perangkat, atau kolaborasi tim." : "Login is not required for this quick debugging flow. Accounts become useful when you need persistent endpoints, cross-device history, or team collaboration."}</p>
       </section>
+      <footer className="site-footer">
+        {language === "id"
+          ? <>Hookbin adalah bagian dari <a href="https://mikrolyt.com">Mikrolyt</a> developer tools.</>
+          : <>Hookbin is part of the <a href="https://mikrolyt.com">Mikrolyt</a> developer tools.</>}
+      </footer>
     </main>
   );
 }
