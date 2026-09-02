@@ -23,7 +23,7 @@ export default function DocsPage() {
   }
 
   return (
-    <main className="docs-page">
+    <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
         "@context": "https://schema.org",
         "@type": "WebApplication",
@@ -33,14 +33,14 @@ export default function DocsPage() {
         operatingSystem: "Any",
         description: "Temporary webhook URL for inspecting requests from integrations.",
       }) }} />
-      <div className="topbar">
-        <div className="topbar-left">
-          <a className="brand" href="https://mikrolyt.com"><span className="brand-mark">M</span><span className="wordmark">mikrolyt<span className="dot">.</span></span></a>
-          <span className="product-tag">Hookbin · M01</span>
+      <header className="site-header">
+        <div className="site-header-inner">
+          <a className="brand" href="https://mikrolyt.com"><span className="brand-mark">M</span><span className="wordmark">Hookbin <small>by Mikrolyt</small><span className="dot">.</span></span></a>
+          <LanguageToggle language={language} onChange={changeLanguage} />
         </div>
-        <LanguageToggle language={language} onChange={changeLanguage} />
-      </div>
+      </header>
       <div className="route-stripe" />
+      <main className="docs-page">
       <Link className="back-link" href="/">← Back to inspector</Link>
       <p className="eyebrow">{language === "id" ? "Panduan penggunaan" : "Usage guide"}</p>
       <h1>{language === "id" ? "Uji webhook dalam hitungan menit" : "Test any webhook in minutes"}</h1>
@@ -122,5 +122,6 @@ export default function DocsPage() {
           : <>Hookbin is part of the <a href="https://mikrolyt.com">Mikrolyt</a> developer tools.</>}
       </footer>
     </main>
+    </>
   );
 }

@@ -175,15 +175,15 @@ export default function Home() {
   );
 
   return (
-    <main>
-      <div className="topbar">
-        <div className="topbar-left">
-          <a className="brand" href="https://mikrolyt.com"><span className="brand-mark">M</span><span className="wordmark">mikrolyt<span className="dot">.</span></span></a>
-          <span className="product-tag">Hookbin · M01</span>
+    <>
+      <header className="site-header">
+        <div className="site-header-inner">
+          <a className="brand" href="https://mikrolyt.com"><span className="brand-mark">M</span><span className="wordmark">Hookbin <small>by Mikrolyt</small><span className="dot">.</span></span></a>
+          <LanguageToggle language={language} onChange={changeLanguage} />
         </div>
-        <LanguageToggle language={language} onChange={changeLanguage} />
-      </div>
+      </header>
       <div className="route-stripe" />
+      <main>
       <section className="hero">
         <p className="eyebrow">{language === "id" ? "M01 · Endpoint webhook sementara" : "M01 · Disposable webhook endpoint"}</p>
         <h1>Hookbin</h1>
@@ -279,6 +279,7 @@ export default function Home() {
           : <>Hookbin is part of the <a href="https://mikrolyt.com">Mikrolyt</a> developer tools.</>}
       </footer>
     </main>
+    </>
   );
 }
 
