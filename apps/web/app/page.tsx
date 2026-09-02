@@ -177,9 +177,13 @@ export default function Home() {
   return (
     <main>
       <div className="topbar">
-        <a className="brand" href="https://mikrolyt.com"><span className="brand-mark">M</span><span>Hookbin <small>by Mikrolyt</small></span></a>
+        <div className="topbar-left">
+          <a className="brand" href="https://mikrolyt.com"><span className="brand-mark">M</span><span className="wordmark">mikrolyt<span className="dot">.</span></span></a>
+          <span className="product-tag">Hookbin · M01</span>
+        </div>
         <LanguageToggle language={language} onChange={changeLanguage} />
       </div>
+      <div className="route-stripe" />
       <section className="hero">
         <p className="eyebrow">{language === "id" ? "M01 · Endpoint webhook sementara" : "M01 · Disposable webhook endpoint"}</p>
         <h1>Hookbin</h1>

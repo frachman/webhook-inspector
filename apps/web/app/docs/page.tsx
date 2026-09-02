@@ -34,9 +34,13 @@ export default function DocsPage() {
         description: "Temporary webhook URL for inspecting requests from integrations.",
       }) }} />
       <div className="topbar">
-        <a className="brand" href="https://mikrolyt.com"><span className="brand-mark">M</span><span>Hookbin <small>by Mikrolyt</small></span></a>
+        <div className="topbar-left">
+          <a className="brand" href="https://mikrolyt.com"><span className="brand-mark">M</span><span className="wordmark">mikrolyt<span className="dot">.</span></span></a>
+          <span className="product-tag">Hookbin · M01</span>
+        </div>
         <LanguageToggle language={language} onChange={changeLanguage} />
       </div>
+      <div className="route-stripe" />
       <Link className="back-link" href="/">← Back to inspector</Link>
       <p className="eyebrow">{language === "id" ? "Panduan penggunaan" : "Usage guide"}</p>
       <h1>{language === "id" ? "Uji webhook dalam hitungan menit" : "Test any webhook in minutes"}</h1>
